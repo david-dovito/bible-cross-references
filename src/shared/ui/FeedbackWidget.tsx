@@ -1,4 +1,4 @@
-import { useRef, useState, type SubmitEvent } from 'react';
+import { useRef, useState } from 'react';
 import { FEEDBACK_ENDPOINT, FEEDBACK_REPO } from '../../site.ts';
 import styles from './FeedbackWidget.module.css';
 
@@ -40,7 +40,7 @@ export function FeedbackWidget() {
     dialogRef.current?.close();
   };
 
-  const submit = async (event: SubmitEvent<HTMLFormElement>) => {
+  const submit = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
     if (FEEDBACK_ENDPOINT === null) {
       // No server of its own: GitHub's new-issue page, with the report already written.
