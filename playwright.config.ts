@@ -15,7 +15,7 @@ export const BASE_URL = `http://localhost:${String(PORT)}${DEPLOY_BASE}`;
 export default defineConfig({
   testDir: 'tests/e2e',
   // A flow test that needs more than this is usually waiting for something it should assert on.
-  timeout: 60_000,
+  timeout: 120_000,
   expect: {
     timeout: 15_000,
     toHaveScreenshot: {

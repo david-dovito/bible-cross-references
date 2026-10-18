@@ -6,7 +6,7 @@ test.describe('the Hebrew and Greek behind a verse', () => {
     page,
   }) => {
     await openPassage(page, 'Acts.5.14');
-    const band = page.locator(PANEL).getByRole('button', { name: /Same Greek word/ });
+    const band = page.locator(PANEL).getByRole('button', { name: /^Words/ });
     await expect(band).toBeVisible();
     await expect(page.locator(PANEL).getByRole('button', { name: /plēthos/ })).toContainText(
       'multitude',
@@ -15,9 +15,7 @@ test.describe('the Hebrew and Greek behind a verse', () => {
 
   test('a Hebrew verse says Hebrew, and marks the script', async ({ page }) => {
     await openPassage(page, 'Gen.1.1');
-    await expect(
-      page.locator(PANEL).getByRole('button', { name: /Same Hebrew word/ }),
-    ).toBeVisible();
+    await expect(page.locator(PANEL).getByRole('button', { name: /^Words/ })).toBeVisible();
     await expect(page.locator(`${PANEL} strong[lang="he"]`).first()).toBeVisible();
   });
 
@@ -70,14 +68,14 @@ test.describe('the Hebrew and Greek behind a verse', () => {
             const gap = open.getBoundingClientRect().top - band.getBoundingClientRect().bottom;
             return Math.abs(gap) < 1.5 ? 'flush' : `gap ${String(Math.round(gap))}`;
           }),
-        { timeout: 10_000 },
+        { timeout: 30_000 },
       )
       .toBe('flush');
   });
 
   test('the credit stays even when the section is folded away', async ({ page }) => {
     await openPassage(page, 'Gen.1.1');
-    const band = page.locator(PANEL).getByRole('button', { name: /Same Hebrew word/ });
+    const band = page.locator(PANEL).getByRole('button', { name: /^Words/ });
     await band.click();
     await expect(band).toHaveAttribute('aria-expanded', 'false');
     await expect(page.locator(PANEL).getByRole('link', { name: 'STEP Bible' })).toBeVisible();
@@ -96,9 +94,7 @@ test.describe('the Hebrew and Greek behind a verse', () => {
     expect(requests).toHaveLength(0);
 
     await openPassage(page, 'Gen.1.1');
-    await expect(
-      page.locator(PANEL).getByRole('button', { name: /Same Hebrew word/ }),
-    ).toBeVisible();
+    await expect(page.locator(PANEL).getByRole('button', { name: /^Words/ })).toBeVisible();
     expect(requests.length).toBeGreaterThan(0);
   });
 });

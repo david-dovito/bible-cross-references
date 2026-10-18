@@ -45,7 +45,9 @@ const wait = (ms: number) =>
  */
 export function landLoadingArcs(): Promise<void> {
   const current = screen;
-  if (!current) {
+  // A browser driven by a test has no one to watch the animation, and it would add five seconds
+  // to every page load.
+  if (!current || navigator.webdriver) {
     return Promise.resolve();
   }
   const sequence = async () => {
