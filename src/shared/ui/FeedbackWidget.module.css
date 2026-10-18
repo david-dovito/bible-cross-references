@@ -8,6 +8,25 @@
   cursor: pointer;
 }
 
+.mark {
+  display: none;
+  vertical-align: -0.15em;
+}
+
+@media (max-width: 53.99rem) {
+  .label {
+    display: none;
+  }
+
+  .mark {
+    display: inline-block;
+  }
+
+  .trigger {
+    text-decoration: none;
+  }
+}
+
 .trigger:hover,
 .trigger:focus-visible {
   color: var(--color-text);

@@ -63,7 +63,12 @@ test.describe('translations', () => {
     await page.locator(PANEL).getByRole('button', { name: /^Copy/ }).first().click();
     // Writing to the clipboard is asynchronous, and the panel says so when it has finished:
     // reading before that is a race, which is a slow machine away from an empty string.
-    await expect(page.locator(PANEL).getByRole('status').first()).toHaveText(/copied/);
+    await expect(
+      page
+        .locator(PANEL)
+        .getByRole('status')
+        .filter({ hasText: /copied/ }),
+    ).toBeVisible();
     const copied = await page.evaluate(() => navigator.clipboard.readText());
     expect(copied).toContain('Psalm 23:1');
     expect(copied).toContain('(BSB)');

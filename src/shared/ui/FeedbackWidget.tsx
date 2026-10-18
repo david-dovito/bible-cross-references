@@ -76,8 +76,22 @@ export function FeedbackWidget() {
 
   return (
     <>
-      <button type="button" className={styles.trigger} onClick={open}>
-        Feedback
+      <button type="button" className={styles.trigger} onClick={open} aria-label="Feedback">
+        <span className={styles.label}>Feedback</span>
+        {/* On a phone the word gives way to a speech bubble, so the footer stays on one line. */}
+        <svg
+          className={styles.mark}
+          viewBox="0 0 16 16"
+          width="14"
+          height="14"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M2.5 3.5h11v7h-6l-3 2.5v-2.5h-2z" />
+        </svg>
       </button>
       <dialog ref={dialogRef} className={styles.dialog} aria-labelledby="feedback-title">
         <form onSubmit={(event) => void submit(event)} className={styles.form}>

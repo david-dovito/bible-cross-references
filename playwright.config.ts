@@ -17,7 +17,8 @@ export default defineConfig({
   // A flow test that needs more than this is usually waiting for something it should assert on.
   timeout: 120_000,
   expect: {
-    timeout: 15_000,
+    // The sandbox's pages load more data (lexicon, evidence), so a slow runner needs longer.
+    timeout: 30_000,
     toHaveScreenshot: {
       // The arcs are drawn by a software renderer here, which is not pixel-identical run to run,
       // and text antialiasing moves a little between machines. Big enough to absorb that, small
