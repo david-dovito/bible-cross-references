@@ -1,6 +1,6 @@
 import { useId } from 'react';
 import type { TranslationId } from '../../../core/datasets/ids.ts';
-import { TRANSLATION_MANIFESTS } from '../../../translations/registry.ts';
+import { PERSONAL_USE_NOTICE, TRANSLATION_MANIFESTS } from '../../../translations/registry.ts';
 import type { TranslationManifest } from '../../../translations/translation-manifest.ts';
 import styles from './controls.module.css';
 import { MenuButton } from './MenuButton.tsx';
@@ -51,7 +51,10 @@ export function TranslationMenu({
           {error} Check your connection and try again.
         </p>
       )}
-      <p className={styles.hint}>{current.attribution}</p>
+      <p className={styles.hint}>
+        {current.attribution}
+        {current.access === 'licensed' && ` ${PERSONAL_USE_NOTICE}`}
+      </p>
     </MenuButton>
   );
 }

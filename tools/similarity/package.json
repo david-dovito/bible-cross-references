@@ -1,0 +1,12 @@
+{
+  "name": "bible-similarity",
+  "private": true,
+  "type": "module",
+  "description": "Offline: embeds every verse of the BSB and writes each verse's nearest neighbours (docs/BIBLE.md). Not part of the site's install or build.",
+  "scripts": {
+    "embed": "node embed.mjs"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "4.3.0"
+  }
+}

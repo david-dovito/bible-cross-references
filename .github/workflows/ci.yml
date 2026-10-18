@@ -84,7 +84,7 @@ jobs:
             test-results
           retention-days: 7
 
-  # Publishes main to trekhleb.dev/bible-cross-references/, once every check has passed. The domain
+  # Publishes main to david-dovito.github.io/bible-cross-references/, once every check has passed. The domain
   # comes from the owner's user site; builds already use the /bible-cross-references/ base path.
   deploy:
     name: Deploy to GitHub Pages

@@ -11,6 +11,7 @@ export default defineConfig([
     'coverage/',
     'data/raw/',
     'public/data/',
+    'tools/',
     'test-results/',
     'playwright-report/',
   ]),

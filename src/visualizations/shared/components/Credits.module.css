@@ -17,3 +17,9 @@
     display: none;
   }
 }
+
+/* A licensed text's credit stays at every width (its notice is a condition, not a courtesy); on a
+   narrow screen it may take the footer's second line rather than be dropped. */
+.licensed {
+  white-space: normal;
+}

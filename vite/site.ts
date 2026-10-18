@@ -14,13 +14,14 @@ export const SITE_NAME = 'Bible Cross-References';
 
 /**
  * Where the built site is served. GitHub Pages serves this repository (bible-cross-references) at
- * trekhleb.dev/bible-cross-references/, under the owner's custom domain. Set `BASE_PATH` and
- * `SITE_ORIGIN` to build for another location, e.g. `BASE_PATH=/` for the root of a domain.
+ * david-dovito.github.io/bible-cross-references/. (The original it grew from is at
+ * trekhleb.dev/bible-cross-references/.) Set `BASE_PATH` and `SITE_ORIGIN` to build for another
+ * location, e.g. `BASE_PATH=/` for the root of a domain.
  */
 export const DEPLOY_BASE = '/bible-cross-references/';
-export const SITE_ORIGIN = process.env['SITE_ORIGIN'] ?? 'https://trekhleb.dev';
+export const SITE_ORIGIN = process.env['SITE_ORIGIN'] ?? 'https://david-dovito.github.io';
 /**
- * The published site, e.g. `https://trekhleb.dev/bible-cross-references/`. Links meant for others
+ * The published site, e.g. `https://david-dovito.github.io/bible-cross-references/`. Links meant for others
  * (copied quotes) point here even from the dev server, which runs at the root.
  */
 export const SITE_URL = new URL(process.env['BASE_PATH'] ?? DEPLOY_BASE, SITE_ORIGIN).href;

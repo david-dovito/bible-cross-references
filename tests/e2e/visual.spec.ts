@@ -76,7 +76,7 @@ test.describe('the Hebrew and Greek', () => {
     await openPanel(page);
     await page
       .locator(PANEL)
-      .getByRole('button', { name: /Same Greek word/ })
+      .getByRole('button', { name: /^Words/ })
       .waitFor();
     await settle(page);
     await expect(page.locator(PANEL)).toHaveScreenshot('words-greek.png');
@@ -98,7 +98,7 @@ test.describe('the Hebrew and Greek', () => {
     await openPanel(page);
     await page
       .locator(PANEL)
-      .getByRole('button', { name: /Same Hebrew word/ })
+      .getByRole('button', { name: /^Words/ })
       .waitFor();
     await settle(page);
     await expect(page.locator(PANEL)).toHaveScreenshot('words-hebrew.png');

@@ -10,7 +10,10 @@ import {
   PROVENANCE,
   verseIndex,
 } from '../test-utils/fixtures.ts';
-import { VizDataBoundary } from '../visualizations/shared/components/VizDataBoundary.tsx';
+import {
+  resetShownData,
+  VizDataBoundary,
+} from '../visualizations/shared/components/VizDataBoundary.tsx';
 import { VizPage } from '../visualizations/shared/components/VizPage.tsx';
 import { vizCoreLoader, resetTranslations } from '../visualizations/shared/viz-data.ts';
 import { ViewSwitch } from './ViewSwitch.tsx';
@@ -59,6 +62,7 @@ function serve({ failing = false } = {}) {
 afterEach(() => {
   vi.unstubAllGlobals();
   vizCoreLoader.reset();
+  resetShownData();
   resetTranslations();
   debugDataLoader.reset();
   document.body.innerHTML = '';

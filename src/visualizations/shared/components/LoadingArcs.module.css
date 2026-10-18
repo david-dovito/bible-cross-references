@@ -11,6 +11,11 @@
   animation: appear 300ms ease-out both;
 }
 
+.loader[data-fading='true'] {
+  opacity: 0;
+  transition: opacity 700ms ease-in;
+}
+
 .stage {
   position: relative;
   inline-size: min(60rem, calc(100vw - 3rem));

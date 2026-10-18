@@ -222,27 +222,34 @@ function parseLexicon(text: string): Map<string, LexiconEntry> {
   return primary;
 }
 
-export function importStepBibleWords(
-  files: readonly TaggedTextFile[],
-  lexicons: readonly LexiconFile[],
-  { maxVerses, license, attribution, provenance }: StepBibleImportOptions,
-): OriginalWordsFile {
-  const versification = CANONICAL_VERSIFICATION;
-  const bookIds = bookIdsByStepCode();
+/** What the tagged texts say, verse by verse, before anything is left out. */
+export interface TaggedWords {
+  /** Every verse each tagged word (extended Strong's number) is used in. */
+  readonly versesByWord: Map<string, Set<VerseIndex>>;
+  /** Each verse's words in their order, as extended Strong's numbers (for finding quotations). */
+  readonly sequences: Map<VerseIndex, string[]>;
+  readonly unknownBooks: readonly string[];
+  readonly unknownReferences: readonly string[];
+  readonly unreadableReferences: readonly string[];
+  readonly superscriptions: readonly string[];
+  readonly wordCount: number;
+}
 
-  const lexicon = new Map<string, LexiconEntry>();
-  for (const file of lexicons) {
-    for (const [strongs, entry] of parseLexicon(file.text)) {
-      lexicon.set(strongs, entry);
-    }
-  }
-
+/**
+ * Reads the tagged texts into the verses each word is used in. The Septuagint importer reads the
+ * Hebrew this way too, all of it: lining a Greek verse up with its Hebrew needs the commonest
+ * words as much as the rare ones.
+ */
+export function readTaggedWords(files: readonly TaggedTextFile[]): TaggedWords {
   const versesByWord = new Map<string, Set<VerseIndex>>();
+  const sequences = new Map<VerseIndex, string[]>();
   const unknownBooks: string[] = [];
   const unknownReferences: string[] = [];
   const unreadableReferences: string[] = [];
   const superscriptions: string[] = [];
   let wordCount = 0;
+  const versification = CANONICAL_VERSIFICATION;
+  const bookIds = bookIdsByStepCode();
 
   for (const { language, text } of files) {
     const column = STRONGS_COLUMN[language];
@@ -283,6 +290,12 @@ export function importStepBibleWords(
       const tagging = line.split('\t')[column] ?? '';
       for (const strongs of tagging.match(pattern) ?? []) {
         wordCount += 1;
+        let sequence = sequences.get(verse);
+        if (!sequence) {
+          sequence = [];
+          sequences.set(verse, sequence);
+        }
+        sequence.push(strongs);
         let verses = versesByWord.get(strongs);
         if (!verses) {
           verses = new Set();
@@ -292,6 +305,40 @@ export function importStepBibleWords(
       }
     }
   }
+
+  return {
+    versesByWord,
+    sequences,
+    unknownBooks,
+    unknownReferences,
+    unreadableReferences,
+    superscriptions,
+    wordCount,
+  };
+}
+
+export function importStepBibleWords(
+  files: readonly TaggedTextFile[],
+  lexicons: readonly LexiconFile[],
+  { maxVerses, license, attribution, provenance }: StepBibleImportOptions,
+): OriginalWordsFile {
+  const versification = CANONICAL_VERSIFICATION;
+
+  const lexicon = new Map<string, LexiconEntry>();
+  for (const file of lexicons) {
+    for (const [strongs, entry] of parseLexicon(file.text)) {
+      lexicon.set(strongs, entry);
+    }
+  }
+
+  const {
+    versesByWord,
+    unknownBooks,
+    unknownReferences,
+    unreadableReferences,
+    superscriptions,
+    wordCount,
+  } = readTaggedWords(files);
 
   if (unreadableReferences.length > 0) {
     throw new Error(

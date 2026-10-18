@@ -56,8 +56,8 @@ describe('PassagePanel', () => {
 
   it('lists where the passage points, and what points at it', () => {
     renderPanel();
-    expect(screen.getByRole('button', { name: /References/ })).toBeDefined();
-    expect(screen.getByRole('button', { name: /Referenced by/ })).toBeDefined();
+    expect(screen.getByRole('button', { name: /^References/ })).toBeDefined();
+    expect(screen.getByRole('button', { name: /^Referenced by/ })).toBeDefined();
     expect(screen.getByText(/But God proves His love/)).toBeDefined();
     expect(screen.getByText(/In the beginning/)).toBeDefined();
   });
@@ -91,7 +91,7 @@ describe('PassagePanel', () => {
 
   it('shows a chapter as a list of its verses', () => {
     renderPanel({ kind: 'chapter', book: 'John', chapter: 3 });
-    expect(screen.getByRole('button', { name: /Verses/ })).toBeDefined();
+    expect(screen.getByRole('button', { name: /^Verses/ })).toBeDefined();
     expect(screen.getByText('For God so loved the world…')).toBeDefined();
   });
 
@@ -105,7 +105,7 @@ describe('PassagePanel', () => {
 
   it('shows the genre breakdown of where a passage connects', () => {
     renderPanel();
-    expect(screen.getByRole('button', { name: /Connects to/ })).toBeDefined();
+    expect(screen.getByRole('button', { name: /^Connects to/ })).toBeDefined();
   });
 
   it('shows actions the host gives it', () => {

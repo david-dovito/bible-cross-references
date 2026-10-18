@@ -1,3 +1,4 @@
+import { PERSONAL_USE_NOTICE } from '../../../translations/registry.ts';
 import type { TranslationManifest } from '../../../translations/translation-manifest.ts';
 import styles from './Credits.module.css';
 
@@ -13,13 +14,13 @@ interface CreditsProps {
  *
  * The links are CC BY 4.0, which asks for the creator, a link to the licence and an indication
  * that the material was changed. The creator and the licence are named at every width; the note
- * that the links were re-indexed joins them from 48rem up, and the full statement, with what the
- * change was, is in the README that the footer's source mark links to. A phone footer has room
- * for the attribution or for the background, not for both.
+ * that the links were re-indexed (to KJV verse numbering) joins them from 48rem up. A phone footer
+ * has room for the attribution or for the background, not for both.
  *
  * The text's own credit comes from its manifest, so it follows whichever translation is read. On
- * a phone it goes with the background: it is a courtesy rather than a condition (every text here
- * is public domain), and the header's picker names the text being read at every width.
+ * a phone it goes with the background for a public-domain text, where it is a courtesy rather than
+ * a condition. A licensed text (the NASB) is the exception: its publisher's notice, and that it is
+ * here for personal use only, show at every width, full in the tooltip and in the picker.
  */
 export function Credits({ translation, inspiration }: CreditsProps) {
   return (
@@ -37,14 +38,25 @@ export function Credits({ translation, inspiration }: CreditsProps) {
         , re-indexed<span className={styles.wide}> to KJV verse numbering</span>
       </span>
       )
-      <span className={styles.text}>
-        {' '}
-        · Text:{' '}
-        <a href={translation.homepage} target="_blank" rel="noreferrer">
-          {translation.abbreviation}
-        </a>
-        <span className={styles.detail}> ({translation.license.name.toLowerCase()})</span>
-      </span>
+      {translation.access === 'licensed' ? (
+        <span className={styles.licensed} title={translation.attribution}>
+          {' '}
+          · Text:{' '}
+          <a href={translation.homepage} target="_blank" rel="noreferrer">
+            {translation.abbreviation}®
+          </a>{' '}
+          {translation.license.name}, used by permission. {PERSONAL_USE_NOTICE}
+        </span>
+      ) : (
+        <span className={styles.text}>
+          {' '}
+          · Text:{' '}
+          <a href={translation.homepage} target="_blank" rel="noreferrer">
+            {translation.abbreviation}
+          </a>
+          <span className={styles.detail}> ({translation.license.name.toLowerCase()})</span>
+        </span>
+      )}
       {inspiration && (
         <span className={styles.wide}>
           {' '}

@@ -20,7 +20,7 @@ npm run test:e2e   # the reader's flows, in a real browser against the built sit
 - an ESLint error (type-aware rules, so a floating promise or an unsafe value fails the build);
 - a file Prettier would reformat — run `npm run format`;
 - a failing unit test;
-- **coverage below 98%** of statements, lines and functions.
+- **coverage below the gate** (85% of statements and lines, 84% of functions, 70% of branches; see `vite.config.ts`).
 
 That last one means new code needs tests in the same pull request. If a change genuinely cannot
 be unit-tested — GPU drawing, touch gestures, a page entry point — cover it in `tests/e2e/`

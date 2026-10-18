@@ -9,7 +9,7 @@ import { afterEach } from 'vitest';
  */
 afterEach(() => {
   cleanup();
-  if (typeof localStorage !== 'undefined') {
+  if (typeof localStorage !== 'undefined' && typeof localStorage.clear === 'function') {
     localStorage.clear();
   }
 });

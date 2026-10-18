@@ -27,13 +27,17 @@ import {
   PreviousIcon,
   type IconComponent,
 } from '../../../shared/ui/icons.tsx';
+import { PERSONAL_USE_NOTICE } from '../../../translations/registry.ts';
 import type { Translation } from '../../../translations/translation.ts';
 import { verseTextOrNote } from '../../../translations/verse-text.ts';
 import { collectConnections, groupByBook, landingNote, type Connection } from '../connections.ts';
 import type { LinkFilter } from '../link-filter.ts';
 import { canCopy, copyQuote, quotePassage, type PassageQuote } from '../passage-quote.ts';
 import { GENRE_COLORS, GENRE_HEX } from '../palette.ts';
+import { EvidenceSection } from './EvidenceSection.tsx';
+import { SortableSections } from './SortableSections.tsx';
 import { OriginalWordsSection } from './OriginalWordsSection.tsx';
+import type { WordLayer } from '../word-layer.ts';
 import { PanelSection } from './PanelSection.tsx';
 import type { VizData } from '../viz-data.ts';
 import styles from './PassagePanel.module.css';
@@ -53,6 +57,8 @@ interface PassagePanelProps {
   readonly onPreview?: (connection: Connection | null) => void;
   /** A passage's address on the published site, for copied quotes. */
   readonly shareUrl: (passage: Passage) => string;
+  /** A word opened under "Same Greek/Hebrew word", for the visualization to draw (or `null`). */
+  readonly onWordLayer?: (layer: WordLayer | null) => void;
 }
 
 const INITIAL_ITEMS = 40;
@@ -185,6 +191,7 @@ export function PassagePanel({
   onClose,
   onPreview,
   shareUrl,
+  onWordLayer,
 }: PassagePanelProps) {
   const { versification, translation, crossReferences, verseGenres } = data;
   const connections = useMemo(
@@ -243,7 +250,8 @@ export function PassagePanel({
 
       {/* Keyed by passage: following a link starts the new passage's details at the top. */}
       <div key={toPassageOsisId(passage, versification)} className={styles.scroll}>
-        {/* A verse's links follow its text; a chapter's come before its (long) list of verses. */}
+        {/* A verse's text comes first, and a chapter's links; the sections below are in the
+            order the reader has dragged them into (SortableSections). */}
         {passage.kind === 'verse' ? (
           <>
             <div className={styles.quotable}>
@@ -264,50 +272,106 @@ export function PassagePanel({
             {actions && <div className={styles.actions}>{actions}</div>}
           </>
         ) : (
-          <>
-            {actions && <div className={styles.actions}>{actions}</div>}
-            <ChapterVerses
-              start={range.start}
-              end={range.end}
-              translation={translation}
-              connections={[...connections.outgoing, ...connections.incoming]}
-              onSelect={onSelect}
-            />
-          </>
+          actions && <div className={styles.actions}>{actions}</div>
         )}
-        <GenreBreakdown
-          connections={[...connections.outgoing, ...connections.incoming]}
-          verseGenres={verseGenres}
+        <SortableSections
+          sections={[
+            ...(passage.kind === 'chapter'
+              ? [
+                  {
+                    id: 'verses',
+                    node: (
+                      <ChapterVerses
+                        start={range.start}
+                        end={range.end}
+                        translation={translation}
+                        connections={[...connections.outgoing, ...connections.incoming]}
+                        onSelect={onSelect}
+                      />
+                    ),
+                  },
+                ]
+              : []),
+            {
+              id: 'connects-to',
+              node: (
+                <GenreBreakdown
+                  connections={[...connections.outgoing, ...connections.incoming]}
+                  verseGenres={verseGenres}
+                />
+              ),
+            },
+            {
+              id: 'references',
+              node: (
+                <ConnectionSection
+                  id="references"
+                  icon={OutgoingIcon}
+                  title="References"
+                  description="where this passage points"
+                  countLabel="passages"
+                  connections={connections.outgoing}
+                  showSourceVerse={passage.kind === 'chapter'}
+                  data={data}
+                  onSelect={onSelect}
+                  onPreview={onPreview}
+                  shareUrl={shareUrl}
+                />
+              ),
+            },
+            {
+              id: 'referenced-by',
+              node: (
+                <ConnectionSection
+                  id="referenced-by"
+                  icon={IncomingIcon}
+                  title="Referenced by"
+                  description="passages that point here"
+                  countLabel="passages"
+                  connections={connections.incoming}
+                  showSourceVerse={passage.kind === 'chapter'}
+                  data={data}
+                  onSelect={onSelect}
+                  onPreview={onPreview}
+                  shareUrl={shareUrl}
+                />
+              ),
+            },
+            ...(passage.kind === 'verse'
+              ? [
+                  {
+                    id: 'evidence',
+                    node: (
+                      <EvidenceSection
+                        verse={passage.verse}
+                        data={data}
+                        connections={[...connections.outgoing, ...connections.incoming]}
+                        onSelect={onSelect}
+                      />
+                    ),
+                  },
+                  {
+                    // A verse at a time: a chapter's words would be most of its vocabulary.
+                    id: 'same-word',
+                    node: (
+                      <OriginalWordsSection
+                        verse={passage.verse}
+                        data={data}
+                        connections={[...connections.outgoing, ...connections.incoming]}
+                        onSelect={onSelect}
+                        onWordLayer={onWordLayer}
+                      />
+                    ),
+                  },
+                ]
+              : []),
+          ]}
         />
-        <ConnectionSection
-          id="references"
-          icon={OutgoingIcon}
-          title="References"
-          description="where this passage points"
-          countLabel="passages"
-          connections={connections.outgoing}
-          showSourceVerse={passage.kind === 'chapter'}
-          data={data}
-          onSelect={onSelect}
-          onPreview={onPreview}
-          shareUrl={shareUrl}
-        />
-        <ConnectionSection
-          id="referenced-by"
-          icon={IncomingIcon}
-          title="Referenced by"
-          description="passages that point here"
-          countLabel="passages"
-          connections={connections.incoming}
-          showSourceVerse={passage.kind === 'chapter'}
-          data={data}
-          onSelect={onSelect}
-          onPreview={onPreview}
-          shareUrl={shareUrl}
-        />
-        {/* A verse at a time: a chapter's words would be most of its vocabulary. */}
-        {passage.kind === 'verse' && (
-          <OriginalWordsSection verse={passage.verse} data={data} onSelect={onSelect} />
+        {/* A licensed text's publisher asks for its full notice wherever the text is shown. */}
+        {translation.manifest.access === 'licensed' && (
+          <p className={styles.licenseNotice}>
+            {translation.manifest.attribution} {PERSONAL_USE_NOTICE}
+          </p>
         )}
       </div>
     </div>

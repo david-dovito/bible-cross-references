@@ -1,12 +1,13 @@
 import type { ReactNode } from 'react';
 import { SourceCodeIcon } from './icons.tsx';
+import { FeedbackWidget } from './FeedbackWidget.tsx';
 import { InstallLink } from './InstallGuide.tsx';
 import styles from './SiteFooter.module.css';
 
 const YEAR = new Date().getFullYear();
 
 /** Where the code lives. The project is open source, so every page points at it. */
-const REPOSITORY_URL = 'https://github.com/trekhleb/bible-cross-references';
+const REPOSITORY_URL = 'https://github.com/david-dovito/bible-cross-references';
 
 interface SiteFooterProps {
   /** Page-specific credits, such as data attribution. */
@@ -36,7 +37,7 @@ export function SiteFooter({ children, className }: SiteFooterProps) {
           <SourceCodeIcon />
           <span className={styles.sourceLabel}>GitHub</span>
         </a>{' '}
-        <InstallLink />
+        <InstallLink /> · <FeedbackWidget />
       </span>
       {children !== undefined && <span className={styles.credits}>{children}</span>}
     </footer>

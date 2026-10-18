@@ -8,6 +8,16 @@ export const SOURCES_FILE = resolve(REPO_ROOT, 'data/sources.json');
 /** Downloaded raw source files (git-ignored). */
 export const RAW_DATA_DIR = resolve(REPO_ROOT, 'data/raw');
 
+/**
+ * Licensed translations David supplies himself (`<translation id>.txt`), git-ignored and never
+ * downloaded.
+ */
+export const PRIVATE_DATA_DIR = resolve(REPO_ROOT, 'data/private');
+
+export function privateFilePath(fileName: string): string {
+  return resolve(PRIVATE_DATA_DIR, fileName);
+}
+
 /** Static assets served by the app; generated datasets go under `public/data` (git-ignored). */
 export const PUBLIC_DIR = resolve(REPO_ROOT, 'public');
 

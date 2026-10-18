@@ -35,3 +35,17 @@ npm-debug.log*
 !.vscode/extensions.json
 .idea/
 .DS_Store
+
+# Sandbox sources, downloaded against their pins in data/sources.json rather than kept here.
+data/raw/eng-asv_vpl.zip
+data/raw/engwebp_vpl.zip
+data/raw/engmsb_vpl.zip
+data/raw/strongs-*.js
+data/raw/lxx-*.js
+data/raw/eng-kjv2006_usfm.zip
+data/raw/bdb-*.xml
+
+# Licensed translations the owner supplies (the NASB, The Lockman Foundation): the source file and
+# anything built from it never go in git.
+data/private/
+public/data/translations/nasb.json

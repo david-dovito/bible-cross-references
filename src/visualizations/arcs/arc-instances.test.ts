@@ -4,7 +4,7 @@ import { CrossReferenceIndex } from '../../cross-references/cross-reference-inde
 import { createCrossReferenceColumns, verseIndex } from '../../test-utils/fixtures.ts';
 import { computeVerseGenres } from '../shared/verse-genres.ts';
 import { voteWeight } from '../shared/vote-weight.ts';
-import { buildArcInstances } from './arc-instances.ts';
+import { buildArcInstances, buildVerseArcInstances } from './arc-instances.ts';
 
 describe('voteWeight', () => {
   it('grows with votes, bounded to [0.2, 1]', () => {
@@ -28,5 +28,15 @@ describe('buildArcInstances', () => {
     expect(Array.from(instances.endpoints)).toEqual([gen + 0.5, johnStart + 1.5]);
     expect(Array.from(instances.genres)).toEqual([0, 5]); // Law → Gospels
     expect(instances.weights[0]).toBeCloseTo(0.6);
+  });
+});
+
+describe('buildVerseArcInstances', () => {
+  it('draws from the verse to every other one, never to itself', () => {
+    const genres = new Uint8Array([0, 1, 2, 3]);
+    const arcs = buildVerseArcInstances(1, [0, 1, 3], genres);
+    expect(arcs.count).toBe(2);
+    expect([...arcs.endpoints]).toEqual([1.5, 0.5, 1.5, 3.5]);
+    expect([...arcs.genres]).toEqual([1, 0, 1, 3]);
   });
 });

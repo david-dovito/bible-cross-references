@@ -5,7 +5,7 @@ import { elementAt } from '../../core/lib/array.ts';
 
 /**
  * The model of the loading animation: arcs of light that grow from one verse to another along the
- * Bible's axis, land with a flash and leave a fading trace, so a dome of connections builds up
+ * Bible's axis, land with a flash and leave a trace, so a dome of connections builds up
  * while the data loads. Positions are fractions of the axis: 0 is Genesis 1:1, 1 is Revelation 22:21.
  */
 
@@ -41,8 +41,10 @@ export interface ArcFlight {
   readonly travel: number;
 }
 
-/** How long an arc's faint trace stays after its light has passed, in ms. */
-export const TRACE_MS = 2400;
+/** How long an arc's trace stays after its light has passed, in ms: past the whole loading animation, so the arcs add up to a diagram. */
+export const TRACE_MS = 60000;
+/** The trace dims to this share of its brightness while it stays. */
+const TRACE_FLOOR = 0.6;
 /** How long the flash where an arc lands lasts, in ms. */
 const LANDING_MS = 700;
 /** The head covers the arc in this share of the travel time; the tail starts after the rest. */
@@ -63,7 +65,7 @@ export function launchFlight(
   now: number,
 ): ArcFlight {
   const from = random();
-  const distance = MIN_DISTANCE + (1 - MIN_DISTANCE) * random() ** 3;
+  const distance = MIN_DISTANCE + (1 - MIN_DISTANCE) * random() ** 1.7;
   const direction = random() < 0.5 ? 1 : -1;
   const forward = from + direction * distance;
   const to = clamp01(forward >= 0 && forward <= 1 ? forward : from - direction * distance);
@@ -75,7 +77,7 @@ export function launchFlight(
     fromGenre: genreAt(from),
     toGenre: genreAt(to),
     launchedAt: now,
-    travel: 1100 + 1600 * Math.abs(to - from),
+    travel: 700 + 1100 * Math.abs(to - from),
   };
 }
 
@@ -104,7 +106,7 @@ export function flightFrame(flight: ArcFlight, now: number): FlightFrame | null 
     head: easeInOutCubic(clamp01(progress / HEAD_SHARE)),
     tail: easeInOutCubic(clamp01((progress - (1 - HEAD_SHARE)) / HEAD_SHARE)),
     light: clamp01(progress / 0.08) * clamp01((1 - progress) / 0.15),
-    trace: clamp01(1 - (elapsed - flight.travel) / TRACE_MS),
+    trace: 1 - (1 - TRACE_FLOOR) * clamp01((elapsed - flight.travel) / TRACE_MS),
     landing: elapsed < landedAt ? 0 : clamp01(1 - (elapsed - landedAt) / LANDING_MS),
   };
 }

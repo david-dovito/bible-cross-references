@@ -63,6 +63,8 @@ const state = vi.hoisted(() => ({
 }));
 
 vi.mock('../viz-data.ts', () => ({
+  lexiconIfLoaded: () => null,
+  lexiconLoader: { load: () => new Promise(() => undefined), reset: vi.fn() },
   originalWordsIfLoaded: () => state.loaded,
   originalWordsLoader: {
     load: () =>
@@ -86,7 +88,9 @@ afterEach(() => {
 });
 
 function renderSection(verse = GEN_1_1) {
-  return render(<OriginalWordsSection verse={verse} data={data} onSelect={vi.fn()} />);
+  return render(
+    <OriginalWordsSection verse={verse} data={data} connections={[]} onSelect={vi.fn()} />,
+  );
 }
 
 describe('OriginalWordsSection', () => {
@@ -97,7 +101,7 @@ describe('OriginalWordsSection', () => {
 
   it('appears once they have', async () => {
     renderSection();
-    expect(await screen.findByText(/SAME HEBREW WORD|Same Hebrew word/i)).toBeDefined();
+    expect(await screen.findByText('Words')).toBeDefined();
   });
 
   it('says Hebrew in the Old Testament and Greek in the New', async () => {
@@ -153,7 +157,9 @@ describe('OriginalWordsSection', () => {
 
   it('follows a verse when it is chosen', async () => {
     const onSelect = vi.fn();
-    render(<OriginalWordsSection verse={ACTS_5_14} data={data} onSelect={onSelect} />);
+    render(
+      <OriginalWordsSection verse={ACTS_5_14} data={data} connections={[]} onSelect={onSelect} />,
+    );
     await userEvent.click(await screen.findByRole('button', { name: /plēthos/ }));
     await userEvent.click(screen.getByText(/Luke 5:6/).closest('button') as HTMLElement);
     expect(onSelect).toHaveBeenCalledWith({ kind: 'verse', verse: LUKE_5_6 });
@@ -174,7 +180,7 @@ describe('OriginalWordsSection', () => {
 
   it('keeps the credit visible when the section is folded away', async () => {
     renderSection();
-    const band = await screen.findByRole('button', { name: /Same Hebrew word/i });
+    const band = await screen.findByRole('button', { name: /^Words/ });
     await userEvent.click(band);
     expect(screen.getByText(/STEP Bible/)).toBeDefined();
   });
@@ -182,7 +188,12 @@ describe('OriginalWordsSection', () => {
   it('shows nothing for a verse with no words of its own', async () => {
     state.loaded = dataset();
     const { container } = render(
-      <OriginalWordsSection verse={verseIndex('Rev', 22, 21)} data={data} onSelect={vi.fn()} />,
+      <OriginalWordsSection
+        verse={verseIndex('Rev', 22, 21)}
+        data={data}
+        connections={[]}
+        onSelect={vi.fn()}
+      />,
     );
     await waitFor(() => {
       expect(container.textContent).toBe('');

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { formatInteger } from '../../../shared/lib/format.ts';
 import { FiltersIcon, ResetIcon } from '../../../shared/ui/icons.tsx';
 import {
@@ -16,6 +17,8 @@ interface FiltersMenuProps {
   /** Links currently shown, and in the whole dataset, so filtering is never hidden. */
   readonly shownLinks: number;
   readonly totalLinks: number;
+  /** A visualization's own filters, after the shared ones. */
+  readonly children?: ReactNode;
 }
 
 /** Short option labels: the minimum is included, hence ≥ (e.g. "≥ 4" keeps links with 4 votes). */
@@ -30,6 +33,7 @@ export function FiltersMenu({
   onChange,
   shownLinks,
   totalLinks,
+  children,
 }: FiltersMenuProps) {
   const isDefault = isDefaultFilter(filter, defaults);
   return (
@@ -57,6 +61,7 @@ export function FiltersMenu({
         {filter.hiddenGenres.size > 0 && `, ${filter.hiddenGenres.size} genres hidden`}).
       </p>
       <p className={styles.hint}>Tip: tap a genre in the legend to hide or show it.</p>
+      {children}
       <button
         type="button"
         className={styles.button}

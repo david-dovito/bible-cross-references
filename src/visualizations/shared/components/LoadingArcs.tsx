@@ -13,16 +13,19 @@ import { GENRE_HEX, GENRE_RGB, type Rgb } from '../palette.ts';
 import { MAX_PIXEL_RATIO } from '../frames.ts';
 import { computeVerseGenres } from '../verse-genres.ts';
 import styles from './LoadingArcs.module.css';
+import { registerLoadingScreen } from '../loading-handoff.ts';
 
 interface LoadingArcsProps {
   /** What is loading: the status line under the animation, also read by screen readers. */
   readonly label: string;
 }
 
-/** At most this many arcs at once, counting the fading traces. */
-const MAX_FLIGHTS = 28;
+/** At most this many arcs at once, counting the traces that stay. */
+const MAX_FLIGHTS = 400;
 /** A new arc takes off after a random pause in this range, in ms. */
-const LAUNCH_PAUSE_MS = { min: 70, max: 220 };
+const LAUNCH_PAUSE_MS = { min: 18, max: 60 };
+/** The fade into the explorer, in ms; matches the CSS. */
+const FADE_MS = 700;
 /** Thickness of the axis, in CSS pixels. */
 const AXIS_THICKNESS = 3;
 /** Pieces of the moving light, brighter toward its head. */
@@ -110,7 +113,7 @@ function paintFlight(
   context.strokeStyle = gradient;
 
   if (frame.trace > 0 && frame.head > 0) {
-    strokeArc(context, pointAt, 0, frame.head, 1.2, 0.16 * frame.trace);
+    strokeArc(context, pointAt, 0, frame.head, 1.1, 0.34 * frame.trace);
   }
   if (frame.light > 0 && frame.head > frame.tail) {
     for (let piece = 0; piece < LIGHT_PIECES; piece += 1) {
@@ -166,6 +169,7 @@ function paint(
 export function LoadingArcs({ label }: LoadingArcsProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const loaderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -209,6 +213,29 @@ export function LoadingArcs({ label }: LoadingArcsProps) {
     const flights: ArcFlight[] = [];
     let nextLaunch = 0;
     let frameRequest = 0;
+    // Once the data is here (see loading-handoff.ts): no new arcs, and a call once the last one
+    // in the air has landed.
+    let landing = false;
+    let landed: (() => void) | null = null;
+    const unregister = registerLoadingScreen({
+      land: () =>
+        new Promise<void>((resolve) => {
+          landing = true;
+          landed = resolve;
+          if (reducedMotion) resolve();
+        }),
+      fade: () =>
+        new Promise<void>((resolve) => {
+          const loader = loaderRef.current;
+          if (!loader || reducedMotion) {
+            resolve();
+            return;
+          }
+          loader.dataset.fading = 'true';
+          setTimeout(resolve, FADE_MS);
+        }),
+      startedAt: performance.now(),
+    });
     const tick = (now: number) => {
       if (flights.length === 0) {
         // Start with a few arcs already under way, so the very first frames are not empty.
@@ -216,7 +243,7 @@ export function LoadingArcs({ label }: LoadingArcsProps) {
           ...[900, 450, 0].map((offset) => launchFlight(Math.random, verseGenres, now - offset)),
         );
       }
-      if (now >= nextLaunch && flights.length < MAX_FLIGHTS) {
+      if (!landing && now >= nextLaunch && flights.length < MAX_FLIGHTS) {
         flights.push(launchFlight(Math.random, verseGenres, now));
         nextLaunch =
           now + LAUNCH_PAUSE_MS.min + Math.random() * (LAUNCH_PAUSE_MS.max - LAUNCH_PAUSE_MS.min);
@@ -229,6 +256,10 @@ export function LoadingArcs({ label }: LoadingArcsProps) {
         else flights.splice(index, 1);
       }
       paint(context, layout, books, frames);
+      if (landing && flights.every((flight) => now - flight.launchedAt >= flight.travel)) {
+        landed?.();
+        landed = null;
+      }
       frameRequest = requestAnimationFrame(tick);
     };
 
@@ -242,11 +273,13 @@ export function LoadingArcs({ label }: LoadingArcsProps) {
     return () => {
       cancelAnimationFrame(frameRequest);
       observer.disconnect();
+      unregister();
+      landed?.();
     };
   }, []);
 
   return (
-    <div className={styles.loader}>
+    <div ref={loaderRef} className={styles.loader}>
       <div ref={stageRef} className={styles.stage}>
         <canvas ref={canvasRef} className={styles.canvas} aria-hidden="true" />
       </div>

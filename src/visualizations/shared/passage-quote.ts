@@ -27,7 +27,7 @@ function escapeHtml(text: string): string {
  * A verse or passage, quoted in full with its reference, translation and a link, e.g.
  *
  *     ¹Now when men began… ²the sons of God saw…
- *     — Genesis 6:1–2 (BSB) https://trekhleb.dev/bible-cross-references/?ref=Gen.6.1
+ *     — Genesis 6:1–2 (BSB) https://david-dovito.github.io/bible-cross-references/?ref=Gen.6.1
  *
  * A passage's verses are numbered (with the chapter too where it changes). Verses a translation
  * omits are left out.
@@ -62,16 +62,19 @@ export function quotePassage({
     verses.push({ mark, text });
   }
   const reference = formatVerseIndexRange(versification, start, end);
-  const { abbreviation } = translation.manifest;
+  const { abbreviation, access, attribution } = translation.manifest;
+  // A licensed text travels with its publisher's notice, which asks to go with every copy.
+  const notice = access === 'licensed' ? attribution : null;
   const text = verses.map(({ mark, text }) => (mark ? superscript(mark) : '') + text).join(' ');
   const html = verses
     .map(({ mark, text }) => (mark ? `<sup>${mark}</sup>` : '') + escapeHtml(text))
     .join(' ');
   return {
-    text: `${text}\n— ${reference} (${abbreviation}) ${url}`,
+    text: `${text}\n— ${reference} (${abbreviation}) ${url}` + (notice ? `\n${notice}` : ''),
     html:
       `<blockquote><p>${html}</p></blockquote>` +
-      `<p>— <a href="${escapeHtml(url)}">${escapeHtml(reference)}</a> (${escapeHtml(abbreviation)})</p>`,
+      `<p>— <a href="${escapeHtml(url)}">${escapeHtml(reference)}</a> (${escapeHtml(abbreviation)})</p>` +
+      (notice ? `<p><small>${escapeHtml(notice)}</small></p>` : ''),
   };
 }
 

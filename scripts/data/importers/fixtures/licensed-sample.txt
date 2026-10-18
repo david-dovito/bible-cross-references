@@ -1,0 +1,5 @@
+Genesis 1:1	Placeholder words for the first verse.
+GEN 1:2 ¶ Placeholder words  for the second verse.
+Ps 23:1	Placeholder words for a psalm.
+John 3:16 Placeholder words for a gospel verse.
+Rev 22:22 Placeholder words for a verse the KJV numbering does not have.

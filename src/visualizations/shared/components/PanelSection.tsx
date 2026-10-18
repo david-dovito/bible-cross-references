@@ -1,3 +1,4 @@
+import { SectionGrip } from './SortableSections.tsx';
 import { useId, type ReactNode } from 'react';
 import { formatInteger } from '../../../shared/lib/format.ts';
 import { useBooleanPreference } from '../../../shared/lib/preferences.ts';
@@ -47,6 +48,7 @@ export function PanelSection({
   return (
     <section className={styles.section}>
       <h3 className={styles.sectionHeader}>
+        <SectionGrip id={id} title={title} />
         <button
           type="button"
           className={styles.sectionToggle}

@@ -35,3 +35,23 @@ export function buildArcInstances(
   }
   return { count, endpoints, genres, weights };
 }
+
+/** Arcs from one verse to each of `others` (the word layer), colored by genre like the links. */
+export function buildVerseArcInstances(
+  from: number,
+  others: readonly number[],
+  verseGenres: Uint8Array,
+): ArcInstances {
+  const targets = others.filter((other) => other !== from);
+  const count = targets.length;
+  const endpoints = new Float32Array(count * 2);
+  const genres = new Float32Array(count * 2);
+  const weights = new Float32Array(count).fill(1);
+  targets.forEach((other, i) => {
+    endpoints[i * 2] = from + 0.5;
+    endpoints[i * 2 + 1] = other + 0.5;
+    genres[i * 2] = elementAt(verseGenres, from);
+    genres[i * 2 + 1] = elementAt(verseGenres, other);
+  });
+  return { count, endpoints, genres, weights };
+}

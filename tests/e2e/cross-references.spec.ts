@@ -4,7 +4,7 @@ import { ACTIVE, PANEL, openPassage, waitForApp } from './helpers.ts';
 test.describe('cross-references', () => {
   test('a verse lists where it points and what points at it', async ({ page }) => {
     await openPassage(page, 'John.3.16');
-    await expect(page.locator(PANEL).getByRole('button', { name: /References/ })).toBeVisible();
+    await expect(page.locator(PANEL).getByRole('button', { name: /^References/ })).toBeVisible();
     await expect(page.locator(PANEL).getByRole('button', { name: /Referenced by/ })).toBeVisible();
     await expect(
       page
@@ -44,7 +44,7 @@ test.describe('cross-references', () => {
 
   test('the genre breakdown opens', async ({ page }) => {
     await openPassage(page, 'John.3.16');
-    const band = page.locator(PANEL).getByRole('button', { name: /Connects to/ });
+    const band = page.locator(PANEL).getByRole('button', { name: /^Connects to/ });
     await band.click();
     await expect(band).toHaveAttribute('aria-expanded', 'true');
     await expect(page.locator(PANEL).getByText('Gospels').first()).toBeVisible();

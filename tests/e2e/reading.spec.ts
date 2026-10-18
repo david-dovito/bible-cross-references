@@ -27,7 +27,7 @@ test.describe('reading the Bible', () => {
     await page.locator(ACTIVE).getByRole('searchbox').fill('Psalm 23');
     await page.locator(ACTIVE).getByRole('searchbox').press('Enter');
     await expect(page.locator(PANEL).getByRole('heading', { name: 'Psalm 23' })).toBeVisible();
-    await expect(page.locator(PANEL).getByRole('button', { name: /Verses/ })).toBeVisible();
+    await expect(page.locator(PANEL).getByRole('button', { name: /^Verses/ })).toBeVisible();
   });
 
   test('a reference that is not a reference says so, and changes nothing', async ({ page }) => {
