@@ -15,8 +15,8 @@
       "description": "King James Version, eBible.org edition, verse-per-line text in a ZIP archive",
       "url": "https://ebible.org/Scriptures/eng-kjv2006_vpl.zip",
       "fileName": "eng-kjv2006_vpl.zip",
-      "sha256": "0058f0cca3a9609f14e435ebbb3c3165c84571de8fbd3d6d7181da8d2d0700ea",
-      "retrievedAt": "2026-10-17",
+      "sha256": "e76e03b6a644d7cdb33c22b90a55211376fae8cc7b6d8c74b8963a430eb85b77",
+      "retrievedAt": "2026-10-18",
       "license": "Public domain (United Kingdom: Crown copyright)",
       "homepage": "https://ebible.org/Scriptures/details.php?id=eng-kjv2006"
     },
@@ -25,8 +25,8 @@
       "description": "Majority Standard Bible, eBible.org edition, verse-per-line text in a ZIP archive",
       "url": "https://ebible.org/Scriptures/engmsb_vpl.zip",
       "fileName": "engmsb_vpl.zip",
-      "sha256": "757e74555dfc38f1035ad7606e00cbd4ca27b67f0b231554d35357ea653e7e2f",
-      "retrievedAt": "2026-10-17",
+      "sha256": "911d8c7ca1d5490f99678d428e17845f67c66b27c4f4989b2f3851b77779ca40",
+      "retrievedAt": "2026-10-18",
       "license": "Public domain",
       "homepage": "https://majoritybible.com/"
     },
@@ -35,8 +35,8 @@
       "description": "American Standard Version (1901), eBible.org edition, verse-per-line text in a ZIP archive",
       "url": "https://ebible.org/Scriptures/eng-asv_vpl.zip",
       "fileName": "eng-asv_vpl.zip",
-      "sha256": "12a9586187d0270678108edddfeea9d6155771f8427065b689bcc62a41d524e1",
-      "retrievedAt": "2026-10-17",
+      "sha256": "f89f9e28a9e74ae9be7ad5c8be19d5789f70a22cc14afb3cf548e7cd9324b1f8",
+      "retrievedAt": "2026-10-18",
       "license": "Public domain",
       "homepage": "https://ebible.org/Scriptures/details.php?id=eng-asv"
     },
@@ -45,8 +45,8 @@
       "description": "World English Bible, eBible.org edition, verse-per-line text in a ZIP archive",
       "url": "https://ebible.org/Scriptures/engwebp_vpl.zip",
       "fileName": "engwebp_vpl.zip",
-      "sha256": "b39f394138c74a25567f616c59fa5c47ad2653547dc927666f41be315b3b99a4",
-      "retrievedAt": "2026-10-17",
+      "sha256": "69276090e9c8e311199f2a6b7697c5a1435bd862ce31b320468ac72dabb4b7d5",
+      "retrievedAt": "2026-10-18",
       "license": "Public domain",
       "homepage": "https://worldenglish.bible/"
     },
