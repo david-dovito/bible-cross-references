@@ -5,7 +5,7 @@ test.describe('cross-references', () => {
   test('a verse lists where it points and what points at it', async ({ page }) => {
     await openPassage(page, 'John.3.16');
     await expect(page.locator(PANEL).getByRole('button', { name: /^References/ })).toBeVisible();
-    await expect(page.locator(PANEL).getByRole('button', { name: /Referenced by/ })).toBeVisible();
+    await expect(page.locator(PANEL).getByRole('button', { name: /^Referenced by/ })).toBeVisible();
     await expect(
       page
         .locator(PANEL)
