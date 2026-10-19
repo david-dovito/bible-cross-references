@@ -1,9 +1,15 @@
 import { useId } from 'react';
 import type { TranslationId } from '../../../core/datasets/ids.ts';
-import { PERSONAL_USE_NOTICE, TRANSLATION_MANIFESTS } from '../../../translations/registry.ts';
+import {
+  attributionOf,
+  availableTranslationManifests,
+  PERSONAL_USE_NOTICE,
+} from '../../../translations/registry.ts';
+import { useOwnTextIds } from '../../../translations/own-texts.ts';
 import type { TranslationManifest } from '../../../translations/translation-manifest.ts';
 import styles from './controls.module.css';
 import { MenuButton } from './MenuButton.tsx';
+import { OwnCopyDialog } from './OwnCopyDialog.tsx';
 
 interface TranslationMenuProps {
   readonly current: TranslationManifest;
@@ -27,10 +33,12 @@ export function TranslationMenu({
 }: TranslationMenuProps) {
   // Both visualizations stay mounted, so each one's radios need a group name of their own.
   const group = useId();
+  const ownIds = useOwnTextIds();
+  const manifests = availableTranslationManifests(undefined, ownIds);
   return (
     <MenuButton label="Translation" value={current.abbreviation} busy={pending}>
       <div className={styles.field} role="radiogroup" aria-label="Translation">
-        {TRANSLATION_MANIFESTS.map((translation) => (
+        {manifests.map((translation) => (
           <label key={translation.id} className={styles.choice}>
             <input
               type="radio"
@@ -52,9 +60,10 @@ export function TranslationMenu({
         </p>
       )}
       <p className={styles.hint}>
-        {current.attribution}
+        {attributionOf(current)}
         {current.access === 'licensed' && ` ${PERSONAL_USE_NOTICE}`}
       </p>
+      <OwnCopyDialog onAdded={onChange} />
     </MenuButton>
   );
 }

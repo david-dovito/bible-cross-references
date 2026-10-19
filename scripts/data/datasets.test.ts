@@ -95,9 +95,11 @@ describe('DATASET_BUILDERS', () => {
       'data/translations/asv.json',
       'data/translations/web.json',
       'data/translations/nasb.json',
+      'data/translations/nkjv.json',
       'data/cross-references/openbible.json',
       'data/words/stepbible.json',
       'data/words/lexicon.json',
+      'data/words/thayer.json',
       'data/words/septuagint.json',
       'data/links/evidence.json',
     ]);

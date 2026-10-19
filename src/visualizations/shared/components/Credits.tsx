@@ -1,4 +1,8 @@
-import { PERSONAL_USE_NOTICE } from '../../../translations/registry.ts';
+import {
+  attributionOf,
+  isLicensedTextBuilt,
+  PERSONAL_USE_NOTICE,
+} from '../../../translations/registry.ts';
 import type { TranslationManifest } from '../../../translations/translation-manifest.ts';
 import styles from './Credits.module.css';
 
@@ -39,13 +43,15 @@ export function Credits({ translation, inspiration }: CreditsProps) {
       </span>
       )
       {translation.access === 'licensed' ? (
-        <span className={styles.licensed} title={translation.attribution}>
+        <span className={styles.licensed} title={attributionOf(translation)}>
           {' '}
           · Text:{' '}
           <a href={translation.homepage} target="_blank" rel="noreferrer">
             {translation.abbreviation}®
           </a>{' '}
-          {translation.license.name}, used by permission. {PERSONAL_USE_NOTICE}
+          {translation.license.name},{' '}
+          {isLicensedTextBuilt(translation.id) ? 'used by permission' : 'your own copy'}.{' '}
+          {PERSONAL_USE_NOTICE}
         </span>
       ) : (
         <span className={styles.text}>

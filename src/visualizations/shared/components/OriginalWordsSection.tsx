@@ -18,6 +18,7 @@ import {
   resetOriginalWords,
 } from '../viz-data.ts';
 import { PanelSection } from './PanelSection.tsx';
+import { ThayerEntry } from './ThayerEntry.tsx';
 import type { VizData } from '../viz-data.ts';
 import styles from './PassagePanel.module.css';
 
@@ -499,6 +500,7 @@ function WordMeaning({
               KJV, {formatInteger(entry.occurrences)}×: {entry.translations}
             </p>
           )}
+          <ThayerEntry strongs={plainStrongs(word.strongs)} />
         </div>
       )}
       {family.length > 0 && (

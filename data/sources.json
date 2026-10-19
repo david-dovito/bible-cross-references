@@ -579,6 +579,16 @@
       "retrievedAt": "2026-10-17",
       "license": "CC BY 4.0 (Open Scriptures Hebrew Bible Project)",
       "homepage": "https://github.com/openscriptures/HebrewLexicon"
+    },
+    {
+      "id": "thayer",
+      "description": "Thayer's Greek-English Lexicon of the New Testament (1889), digitized by nigelmsipa as JSON, pinned at a commit",
+      "url": "https://raw.githubusercontent.com/nigelmsipa/thayers-greek-lexicon-dataset/e4a42b1cea86c3cb592b3e87c350fac6e9c46b13/data/thayer_lexicon.json",
+      "fileName": "thayer_lexicon.json",
+      "sha256": "7794a7801e102ed99e6e20906e95ac20dcb4dfc67be20ea66b786026b48e8e59",
+      "retrievedAt": "2026-10-19",
+      "license": "Public domain (the 1889 text); the digitization is CC0 1.0",
+      "homepage": "https://github.com/nigelmsipa/thayers-greek-lexicon-dataset"
     }
   ]
 }
