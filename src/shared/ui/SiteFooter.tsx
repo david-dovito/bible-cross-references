@@ -37,7 +37,7 @@ export function SiteFooter({ children, className }: SiteFooterProps) {
           <SourceCodeIcon />
           <span className={styles.sourceLabel}>GitHub</span>
         </a>{' '}
-        <InstallLink /> · <FeedbackWidget />
+        <InstallLink /> <FeedbackWidget />
       </span>
       {children !== undefined && <span className={styles.credits}>{children}</span>}
     </footer>

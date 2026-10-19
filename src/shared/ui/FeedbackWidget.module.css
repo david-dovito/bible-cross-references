@@ -8,6 +8,12 @@
   cursor: pointer;
 }
 
+.trigger::before {
+  content: '· ';
+  text-decoration: none;
+  display: inline-block;
+}
+
 .mark {
   display: none;
   vertical-align: -0.15em;
@@ -24,6 +30,11 @@
 
   .trigger {
     text-decoration: none;
+  }
+
+  /* The dot only separates words; beside the install arrow the bubble needs none. */
+  .trigger::before {
+    content: none;
   }
 }
 
