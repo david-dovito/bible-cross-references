@@ -42,7 +42,7 @@ replacement for his. Some of what is here is experimental, and some of it may no
   direction, in the genre colors. The idea comes from Chris Harrison's BibleViz.
 - **A panel you arrange.** Drag the panel's sections into the order you like, or use the arrow
   keys. The order is kept in your browser.
-- **A loading animation that finishes.** It runs for five seconds, builds a full arc diagram, and
+- **A loading animation that finishes.** It runs for three seconds, builds a full arc diagram, and
   fades into the explorer.
 - **A feedback form.** The footer sends a report as an issue in this repository, labeled `bug`,
   `feature` or `enhancement`. Without a server it opens GitHub's new-issue page, already filled in.

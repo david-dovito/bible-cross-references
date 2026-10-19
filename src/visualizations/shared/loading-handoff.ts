@@ -7,11 +7,11 @@
  */
 
 /** The whole loading animation, from first frame to the start of the fade (David, 2026-10-18). */
-export const ANIMATION_MS = 5000;
+export const ANIMATION_MS = 3000;
 /** The arcs stop launching this far in, so the last ones land before the fade. */
-export const LAST_LAUNCH_MS = 3400;
+export const LAST_LAUNCH_MS = 1000;
 /** Longest the explorer waits for the loading screen once the data is here. */
-export const MAX_LANDING_MS = 6500;
+export const MAX_LANDING_MS = 4500;
 
 interface LoadingScreen {
   /** Stops launching arcs; settles once every arc in the air has landed. */
