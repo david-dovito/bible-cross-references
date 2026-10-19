@@ -91,6 +91,14 @@ const EDGE_PAN_ZONE_PX = 44;
 const EDGE_PAN_MAX_SPEED = 900;
 
 /**
+ * Whether to skip the intro: for readers who asked for less motion, and for a browser driven by a
+ * test, whose software renderer would draw the intro one slow frame at a time, for minutes.
+ */
+function skipsMotion(): boolean {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches || navigator.webdriver;
+}
+
+/**
  * Drives the arc diagram imperatively (no React re-renders on every wheel tick): it owns the
  * WebGL scene, the 2D overlay, the visible window, and all input handling.
  */
@@ -248,7 +256,7 @@ export class ArcsController {
     if (this.#intro !== 'pending') {
       return;
     }
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (!skipsMotion()) {
       this.#scene.setReveal(0);
     }
     if (this.#hasLinks && this.#active && this.#layout.width > 0 && this.#layout.height > 0) {
@@ -257,7 +265,7 @@ export class ArcsController {
   }
 
   #playIntro(): void {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (skipsMotion()) {
       this.#scene.setReveal(1);
       this.#intro = 'done';
       return;
