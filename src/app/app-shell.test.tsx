@@ -1,6 +1,6 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi, beforeAll } from 'vitest';
 import { DebugPage } from '../features/debug/DebugPage.tsx';
 import { debugDataLoader } from '../features/debug/debug-data.ts';
 import { mount } from '../shared/lib/mount.tsx';
@@ -58,6 +58,13 @@ function serve({ failing = false } = {}) {
   vi.stubGlobal('fetch', fetch);
   return fetch;
 }
+
+// The views load on demand; loading them up front keeps a test from ending while one is still on
+// its way (which tears the environment down under it).
+beforeAll(async () => {
+  await import('../visualizations/arcs/index.ts');
+  await import('../visualizations/threads/index.ts');
+});
 
 afterEach(() => {
   vi.unstubAllGlobals();
