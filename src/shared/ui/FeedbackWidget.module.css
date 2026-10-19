@@ -144,3 +144,11 @@
   opacity: 0.6;
   cursor: progress;
 }
+
+/* The narrowest phones (320px) have no room left in a one-line footer once the licence credit is
+   set; there the form is not offered. */
+@media (max-width: 20.99rem) {
+  .trigger {
+    display: none;
+  }
+}
