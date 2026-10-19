@@ -27,7 +27,7 @@ import {
   PreviousIcon,
   type IconComponent,
 } from '../../../shared/ui/icons.tsx';
-import { PERSONAL_USE_NOTICE } from '../../../translations/registry.ts';
+import { attributionOf, PERSONAL_USE_NOTICE } from '../../../translations/registry.ts';
 import type { Translation } from '../../../translations/translation.ts';
 import { verseTextOrNote } from '../../../translations/verse-text.ts';
 import { collectConnections, groupByBook, landingNote, type Connection } from '../connections.ts';
@@ -370,7 +370,7 @@ export function PassagePanel({
         {/* A licensed text's publisher asks for its full notice wherever the text is shown. */}
         {translation.manifest.access === 'licensed' && (
           <p className={styles.licenseNotice}>
-            {translation.manifest.attribution} {PERSONAL_USE_NOTICE}
+            {attributionOf(translation.manifest)} {PERSONAL_USE_NOTICE}
           </p>
         )}
       </div>

@@ -94,9 +94,26 @@ const TRANSLATIONS: Readonly<Record<TranslationId, TranslationManifest>> = {
     homepage: 'https://www.lockman.org/',
     access: 'licensed',
   },
+  nkjv: {
+    id: 'nkjv',
+    name: 'New King James Version',
+    abbreviation: 'NKJV',
+    language: 'en',
+    direction: 'ltr',
+    versification: 'kjv',
+    license: {
+      name: '© Thomas Nelson',
+      url: 'https://www.harpercollinschristian.com/permissions/',
+    },
+    attribution:
+      'Scripture taken from the New King James Version®. Copyright © 1982 by Thomas Nelson. ' +
+      'Used by permission. All rights reserved.',
+    homepage: 'https://www.thomasnelson.com/',
+    access: 'licensed',
+  },
 };
 
-/** Shown beside a licensed translation's credit: the text is here for David's own use. */
+/** Shown beside a licensed translation's credit: the text is for the reader's own use. */
 export const PERSONAL_USE_NOTICE = 'For personal use only.';
 
 /**
@@ -110,21 +127,48 @@ const BUILT_LICENSED_IDS: readonly string[] = (
   .split(',')
   .filter((id) => id !== '');
 
-/** Whether the app can show a translation: bundled ones always, licensed ones once built. */
+/** Whether this build holds the licensed text itself (a file David supplied when it was built). */
+export function isLicensedTextBuilt(id: TranslationId): boolean {
+  return BUILT_LICENSED_IDS.includes(id);
+}
+
+/**
+ * Whether the app can show a translation: bundled ones always; licensed ones once built, or once
+ * the reader has loaded their own copy into this browser (`own-texts.ts`).
+ */
 export function isTranslationAvailable(
   id: TranslationId,
   builtLicensedIds: readonly string[] = BUILT_LICENSED_IDS,
+  ownIds: readonly string[] = [],
 ): boolean {
-  return TRANSLATIONS[id].access !== 'licensed' || builtLicensedIds.includes(id);
+  return (
+    TRANSLATIONS[id].access !== 'licensed' || builtLicensedIds.includes(id) || ownIds.includes(id)
+  );
 }
 
 /** The translations a reader can pick, in the order the picker lists them. */
 export function availableTranslationManifests(
   builtLicensedIds: readonly string[] = BUILT_LICENSED_IDS,
+  ownIds: readonly string[] = [],
 ): readonly TranslationManifest[] {
   return Object.values(TRANSLATIONS).filter(({ id }) =>
-    isTranslationAvailable(id, builtLicensedIds),
+    isTranslationAvailable(id, builtLicensedIds, ownIds),
   );
+}
+
+/**
+ * The credit line for a translation. A reader's own copy of a licensed text does not carry the
+ * publisher's "used by permission" wording (nothing was permitted to this site), only whose it is.
+ */
+export function attributionOf(manifest: TranslationManifest): string {
+  return manifest.access === 'licensed' && !isLicensedTextBuilt(manifest.id)
+    ? `Your own copy of the ${manifest.name}. ${manifest.license.name}.`
+    : manifest.attribution;
+}
+
+/** The licensed translations a reader may load a copy of, whether or not they have yet. */
+export function licensedTranslationManifests(): readonly TranslationManifest[] {
+  return Object.values(TRANSLATIONS).filter(({ access }) => access === 'licensed');
 }
 
 /** Every translation this build can show, in the order the picker lists them. */

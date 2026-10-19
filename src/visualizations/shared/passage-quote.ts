@@ -1,6 +1,7 @@
 import { formatVerseIndexRange } from '../../core/bible/reference-format.ts';
 import type { VerseIndex } from '../../core/bible/verse-ref.ts';
 import type { Versification } from '../../core/bible/versification.ts';
+import { attributionOf } from '../../translations/registry.ts';
 import type { Translation } from '../../translations/translation.ts';
 
 /** A quoted passage: plain text for anywhere, and HTML that rich editors keep as a quote. */
@@ -62,7 +63,8 @@ export function quotePassage({
     verses.push({ mark, text });
   }
   const reference = formatVerseIndexRange(versification, start, end);
-  const { abbreviation, access, attribution } = translation.manifest;
+  const { abbreviation, access } = translation.manifest;
+  const attribution = attributionOf(translation.manifest);
   // A licensed text travels with its publisher's notice, which asks to go with every copy.
   const notice = access === 'licensed' ? attribution : null;
   const text = verses.map(({ mark, text }) => (mark ? superscript(mark) : '') + text).join(' ');

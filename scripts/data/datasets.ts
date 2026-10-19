@@ -6,8 +6,12 @@ import type {
   LexiconFile,
   SeptuagintFile,
   OriginalWordsFile,
+  ThayerFile,
   TranslationTextFile,
 } from '../../src/core/datasets/formats.ts';
+import { DATASET_SCHEMA_VERSION } from '../../src/core/datasets/formats.ts';
+import { CANONICAL_VERSIFICATION } from '../../src/core/bible/versification.ts';
+import { createNotice } from './lib/notices.ts';
 import type {
   CrossReferenceSourceId,
   TranslationId,
@@ -18,6 +22,7 @@ import {
   evidenceDatasetPath,
   lexiconDatasetPath,
   septuagintDatasetPath,
+  thayerDatasetPath,
   originalWordsDatasetPath,
   translationDatasetPath,
 } from '../../src/core/datasets/paths.ts';
@@ -68,6 +73,7 @@ export interface DatasetBuilder {
     | LexiconFile
     | SeptuagintFile
     | EvidenceFile
+    | ThayerFile
     | null
   >;
 }
@@ -154,6 +160,7 @@ const TRANSLATION_BUILDERS: Readonly<Record<TranslationId, DatasetBuilder>> = {
     'Rom.14.26': 'Rom.16.27',
   }),
   nasb: licensedTranslation('nasb'),
+  nkjv: licensedTranslation('nkjv'),
 };
 
 /** One builder per cross-reference source. */
@@ -382,6 +389,73 @@ function septuagintOnce(readSource: RawSourceReader) {
   return septuagint;
 }
 
+export const THAYER_ATTRIBUTION =
+  "Thayer's Greek-English Lexicon of the New Testament (1889), public domain; digitized by " +
+  'nigelmsipa (CC0 1.0), whose extraction was machine-read from the printed pages and may hold ' +
+  'errors. Modified: entries shortened to their first 3,000 characters.';
+
+/** Longest entry kept: a few, like καί and ὁ, run to 20,000 characters. */
+const MAX_THAYER_ENTRY = 3000;
+
+/** Cuts a long entry at the end of a sentence or, failing that, a word. */
+function shortenThayer(text: string): string {
+  if (text.length <= MAX_THAYER_ENTRY) {
+    return text;
+  }
+  const head = text.slice(0, MAX_THAYER_ENTRY);
+  const cut = Math.max(head.lastIndexOf('. '), head.lastIndexOf('; '));
+  return `${head.slice(0, cut > MAX_THAYER_ENTRY / 2 ? cut + 1 : head.lastIndexOf(' '))} …`;
+}
+
+const THAYER_BUILDER: DatasetBuilder = {
+  outputPath: thayerDatasetPath(),
+  build: async (readSource) => {
+    const { source, content } = await readSource('thayer');
+    const entries: unknown = JSON.parse(content.toString('utf8'));
+    if (!Array.isArray(entries)) {
+      throw new Error("Thayer's: the file is not a list of entries.");
+    }
+    const strongs: string[] = [];
+    const text: string[] = [];
+    let unlinked = 0;
+    for (const entry of entries as readonly Record<string, unknown>[]) {
+      const numbers = ([] as unknown[])
+        .concat(entry['strongs'] ?? [])
+        .filter((value): value is string => typeof value === 'string' && /^G\d+/.test(value));
+      const body =
+        typeof entry['text'] === 'string' ? entry['text'].replace(/\s+/g, ' ').trim() : '';
+      if (numbers.length === 0 || body === '') {
+        unlinked += 1;
+        continue;
+      }
+      for (const number of numbers) {
+        strongs.push(plainStrongs(number));
+        text.push(shortenThayer(body));
+      }
+    }
+    return {
+      format: 'thayer',
+      schemaVersion: DATASET_SCHEMA_VERSION,
+      versification: CANONICAL_VERSIFICATION.id,
+      provenance: { ...provenanceOf(source), snapshotDate: null },
+      notices: [
+        createNotice(
+          'info',
+          "Thayer's entries with no Strong's number, left out",
+          Array.from({ length: unlinked }, (_, index) => `entry ${String(index + 1)}`),
+        ),
+      ],
+      license: {
+        name: 'Public domain; CC0 1.0',
+        url: 'https://creativecommons.org/publicdomain/zero/1.0/',
+      },
+      attribution: THAYER_ATTRIBUTION,
+      strongs,
+      text,
+    } satisfies ThayerFile;
+  },
+};
+
 const SEPTUAGINT_BUILDER: DatasetBuilder = {
   outputPath: septuagintDatasetPath(),
   build: async (readSource) => (await septuagintOnce(readSource)).file,
@@ -492,6 +566,7 @@ export const DATASET_BUILDERS: readonly DatasetBuilder[] = [
   ...Object.values(CROSS_REFERENCE_BUILDERS),
   ...Object.values(WORD_BUILDERS),
   LEXICON_BUILDER,
+  THAYER_BUILDER,
   SEPTUAGINT_BUILDER,
   EVIDENCE_BUILDER,
 ];

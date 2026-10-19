@@ -22,8 +22,12 @@ replacement for his. Some of what is here is experimental, and some of it may no
 ## What the sandbox adds
 
 - **More translations.** BSB and KJV (his), plus ASV, WEB and MSB (all public domain). MSB stands
-  in for the NKJV. The NASB works if you supply the file yourself (see
-  [Licensed translations](#licensed-translations)).
+  in for the NKJV. The NASB and NKJV are under copyright, so they are not in the repository or on the
+  live site. A menu item, "Use my own copy of another translation…", lets a reader load a text they
+  already own; it stays in their browser and is never uploaded. A build can also include one you
+  supply as a file (see [Licensed translations](#licensed-translations)).
+- **Thayer's lexicon.** Thayer's Greek-English Lexicon (1889, public domain) opens under each Greek
+  word, for the 3,790 Strong's numbers its digitization covers.
 - **A lexicon.** Tap a Hebrew or Greek word to see its meaning (Strong's, with Abbott-Smith senses
   for Greek and the Brown-Driver-Briggs outline for Hebrew), its word family (one root up, the
   words built on it down), and the verses that use it.
@@ -136,16 +140,16 @@ that installed the app has already done the work.
 Everything here is openly available data. The original's sources are unchanged; the sandbox adds
 the rows marked "sandbox".
 
-| Dataset          | Source                                                                                                                                                              | License                                                                                 |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| Bible text       | [Berean Standard Bible](https://berean.bible/) (BSB), the default                                                                                                   | Public domain                                                                           |
-| Bible text       | [King James Version](https://ebible.org/Scriptures/details.php?id=eng-kjv2006) (KJV), from eBible.org                                                               | Public domain (see the note below)                                                      |
-| Bible text       | Sandbox: [ASV](https://ebible.org/Scriptures/details.php?id=eng-asv), [WEB](https://worldenglish.bible/), [MSB](https://majoritybible.com/)                         | Public domain                                                                           |
-| Cross-references | [OpenBible.info](https://www.openbible.info/labs/cross-references/), largely from the _Treasury of Scripture Knowledge_                                             | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)                               |
-| Original words   | [STEPBible](https://github.com/STEPBible/STEPBible-Data) (TAHOT, TAGNT and their lexicons), Tyndale House, Cambridge                                                | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)                               |
-| Word meanings    | Sandbox: [Strong's dictionaries](https://github.com/openscriptures/strongs) and the [BDB lexicon](https://github.com/openscriptures/HebrewLexicon), Open Scriptures | Public domain texts, CC BY-SA and CC BY 4.0 packaging, as listed in `data/sources.json` |
-| Septuagint       | Sandbox: [Open Scriptures Septuagint Project](https://github.com/openscriptures/GreekResources) (the CATSS alignment)                                               | CC BY 4.0                                                                               |
-| Evidence         | Sandbox: computed here from the data above, and from bge-small-en-v1.5 (BAAI, MIT) run over the BSB, offline, in `tools/similarity/`                                | Derived                                                                                 |
+| Dataset          | Source                                                                                                                                                                                                                                                                                     | License                                                                                 |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
+| Bible text       | [Berean Standard Bible](https://berean.bible/) (BSB), the default                                                                                                                                                                                                                          | Public domain                                                                           |
+| Bible text       | [King James Version](https://ebible.org/Scriptures/details.php?id=eng-kjv2006) (KJV), from eBible.org                                                                                                                                                                                      | Public domain (see the note below)                                                      |
+| Bible text       | Sandbox: [ASV](https://ebible.org/Scriptures/details.php?id=eng-asv), [WEB](https://worldenglish.bible/), [MSB](https://majoritybible.com/)                                                                                                                                                | Public domain                                                                           |
+| Cross-references | [OpenBible.info](https://www.openbible.info/labs/cross-references/), largely from the _Treasury of Scripture Knowledge_                                                                                                                                                                    | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)                               |
+| Original words   | [STEPBible](https://github.com/STEPBible/STEPBible-Data) (TAHOT, TAGNT and their lexicons), Tyndale House, Cambridge                                                                                                                                                                       | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)                               |
+| Word meanings    | Sandbox: [Thayer's Lexicon](https://github.com/nigelmsipa/thayers-greek-lexicon-dataset) (1889, machine-read; may hold errors), [Strong's dictionaries](https://github.com/openscriptures/strongs) and the [BDB lexicon](https://github.com/openscriptures/HebrewLexicon), Open Scriptures | Public domain texts, CC BY-SA and CC BY 4.0 packaging, as listed in `data/sources.json` |
+| Septuagint       | Sandbox: [Open Scriptures Septuagint Project](https://github.com/openscriptures/GreekResources) (the CATSS alignment)                                                                                                                                                                      | CC BY 4.0                                                                               |
+| Evidence         | Sandbox: computed here from the data above, and from bge-small-en-v1.5 (BAAI, MIT) run over the BSB, offline, in `tools/similarity/`                                                                                                                                                       | Derived                                                                                 |
 
 The notes in the original's README about the KJV in the United Kingdom, and about what the
 cross-references mean (and how votes rank them), apply here unchanged. Read them in
@@ -159,10 +163,15 @@ the build stops and tells you. `npm run dev` and `npm run build` turn the source
 
 ### Licensed translations
 
-The NASB is under copyright (The Lockman Foundation), so it is not in this repository and is never
-downloaded. If you own a copy, put it at `data/private/nasb.txt`, one verse per line (book name,
-chapter and verse, a tab, the text). The build then adds it. The folder and anything built from it
-are git-ignored. When shown, the NASB carries Lockman's notice and "For personal use only."
+The NASB (The Lockman Foundation) and NKJV (Thomas Nelson) are under copyright, so they are not in
+this repository and are never downloaded. Two ways to use them:
+
+- **In the browser.** Open the translation menu, choose "Use my own copy of another translation…",
+  pick the translation and a text file you own (one verse per line, like `John 3:16 For God so loved…`).
+  It is read and kept in your browser only. Nothing is uploaded.
+- **In a build.** Put the file at `data/private/nasb.txt` or `data/private/nkjv.txt`. The build adds it.
+  The folder and anything built from it are git-ignored. A public site needs the publisher's
+  permission first. When shown, the text carries the publisher's notice and "For personal use only."
 
 ### Refreshing the meaning model
 

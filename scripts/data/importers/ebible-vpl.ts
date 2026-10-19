@@ -1,4 +1,5 @@
 import { BOOKS, type BookId } from '../../../src/core/bible/books.ts';
+import { BOOK_CODES } from '../../../src/core/bible/ebible-codes.ts';
 import { parseOsisId, toOsisId, type VerseIndex } from '../../../src/core/bible/verse-ref.ts';
 import { CANONICAL_VERSIFICATION } from '../../../src/core/bible/versification.ts';
 import {
@@ -18,79 +19,7 @@ import { createNotice } from '../lib/notices.ts';
  * Books are named with the three-letter codes BibleWorks uses, listed below in canonical order.
  */
 
-/** eBible's book codes, in the same order as `BOOKS`. */
-export const BOOK_CODES = [
-  'GEN',
-  'EXO',
-  'LEV',
-  'NUM',
-  'DEU',
-  'JOS',
-  'JDG',
-  'RUT',
-  '1SA',
-  '2SA',
-  '1KI',
-  '2KI',
-  '1CH',
-  '2CH',
-  'EZR',
-  'NEH',
-  'EST',
-  'JOB',
-  'PSA',
-  'PRO',
-  'ECC',
-  'SOL',
-  'ISA',
-  'JER',
-  'LAM',
-  'EZE',
-  'DAN',
-  'HOS',
-  'JOE',
-  'AMO',
-  'OBA',
-  'JON',
-  'MIC',
-  'NAH',
-  'HAB',
-  'ZEP',
-  'HAG',
-  'ZEC',
-  'MAL',
-  'MAT',
-  'MAR',
-  'LUK',
-  'JOH',
-  'ACT',
-  'ROM',
-  '1CO',
-  '2CO',
-  'GAL',
-  'EPH',
-  'PHI',
-  'COL',
-  '1TH',
-  '2TH',
-  '1TI',
-  '2TI',
-  'TIT',
-  'PHM',
-  'HEB',
-  'JAM',
-  '1PE',
-  '2PE',
-  '1JO',
-  '2JO',
-  '3JO',
-  'JUD',
-  'REV',
-] as const;
-
-if (BOOK_CODES.length !== BOOKS.length) {
-  throw new Error(`eBible: ${BOOK_CODES.length} book codes for ${BOOKS.length} books.`);
-}
+export { BOOK_CODES };
 
 const BOOK_IDS_BY_CODE: ReadonlyMap<string, BookId> = new Map(
   BOOKS.map((book, index) => [BOOK_CODES[index] ?? '', book.id]),

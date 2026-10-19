@@ -167,6 +167,15 @@ export interface SeptuagintPairColumns {
   readonly toHebrew: readonly number[];
 }
 
+/** Thayer's Greek-English Lexicon (1889): one entry per Strong's number, as running text. */
+export interface ThayerFile extends DatasetFileBase<'thayer'> {
+  readonly license: LicenseInfo;
+  readonly attribution: string;
+  /** Plain Strong's numbers (`G907`), each with the entry's text at the same position. */
+  readonly strongs: readonly string[];
+  readonly text: readonly string[];
+}
+
 export interface SeptuagintFile extends DatasetFileBase<'septuagint'> {
   readonly license: LicenseInfo;
   readonly attribution: string;
@@ -338,6 +347,21 @@ export function parseLexiconFile(json: unknown, versification: VersificationId):
       equivalentOffsets: integers('equivalentOffsets'),
       equivalents: integers('equivalents'),
     },
+  };
+}
+
+export function parseThayerFile(json: unknown, versification: VersificationId): ThayerFile {
+  const { record, base } = parseFileBase(json, 'thayer', versification);
+  const license = expectRecord(record['license'], 'license');
+  return {
+    ...base,
+    license: {
+      name: expectString(license['name'], 'license.name'),
+      url: expectString(license['url'], 'license.url'),
+    },
+    attribution: expectString(record['attribution'], 'attribution'),
+    strongs: expectStringArray(record['strongs'], 'strongs'),
+    text: expectStringArray(record['text'], 'text'),
   };
 }
 

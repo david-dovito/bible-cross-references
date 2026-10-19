@@ -59,6 +59,11 @@ export function readPreference(key: string): string | null {
   return read(key);
 }
 
+/** Stores a preference outside React (the same store the hooks read). */
+export function writePreference(key: string, value: string): void {
+  write(key, value);
+}
+
 /** A stored preference, `fallback` until the reader changes it. */
 export function useStringPreference(
   key: string,

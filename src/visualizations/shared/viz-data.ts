@@ -10,6 +10,7 @@ import { getTranslationManifest } from '../../translations/registry.ts';
 import type { Translation } from '../../translations/translation.ts';
 import { loadEvidence, type EvidenceDataset } from '../../links/load-evidence.ts';
 import { loadLexicon, type LexiconDataset } from '../../words/load-lexicon.ts';
+import { loadThayer, type ThayerDataset } from '../../words/load-thayer.ts';
 import { loadOriginalWords, type OriginalWordsDataset } from '../../words/load-original-words.ts';
 import { getWordSourceManifest } from '../../words/registry.ts';
 import { computeVerseGenres } from './verse-genres.ts';
@@ -113,6 +114,12 @@ let loadedLexicon: LexiconDataset | null = null;
 export function lexiconIfLoaded(): LexiconDataset | null {
   return loadedLexicon;
 }
+
+/**
+ * Thayer's lexicon: fetched the first time a reader opens it for a Greek word (it is the largest
+ * of the word datasets, and most readers never open it).
+ */
+export const thayerLoader = createCachedLoader(async (): Promise<ThayerDataset> => loadThayer());
 
 /**
  * What links verses besides the cross-references (shared words, quotations, meaning). Fetched

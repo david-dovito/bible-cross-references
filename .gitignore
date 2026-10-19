@@ -44,6 +44,7 @@ data/raw/strongs-*.js
 data/raw/lxx-*.js
 data/raw/eng-kjv2006_usfm.zip
 data/raw/bdb-*.xml
+data/raw/thayer_lexicon.json
 
 # Licensed translations the owner supplies (the NASB, The Lockman Foundation): the source file and
 # anything built from it never go in git.

@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { isTranslationId, type TranslationId } from '../core/datasets/ids.ts';
 import { readPreference, useStringPreference } from '../shared/lib/preferences.ts';
+import { readOwnTextIds } from '../translations/own-texts.ts';
 import { DEFAULT_TRANSLATION_ID, isTranslationAvailable } from '../translations/registry.ts';
 
 /**
@@ -16,7 +17,7 @@ const PREFERENCE_KEY = 'translation';
 
 /** Whether a stored or linked id names a translation this build can show. */
 function isShowable(value: string): value is TranslationId {
-  return isTranslationId(value) && isTranslationAvailable(value);
+  return isTranslationId(value) && isTranslationAvailable(value, undefined, readOwnTextIds());
 }
 
 /**

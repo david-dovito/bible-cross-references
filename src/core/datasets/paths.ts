@@ -23,6 +23,11 @@ export function lexiconDatasetPath(): string {
   return `${DATASETS_DIRECTORY}/words/lexicon.json`;
 }
 
+/** Thayer's Greek-English Lexicon (1889), by Strong's number. */
+export function thayerDatasetPath(): string {
+  return `${DATASETS_DIRECTORY}/words/thayer.json`;
+}
+
 /** The Septuagint: its Greek words by KJV verse, and the Hebrew and Greek words it pairs. */
 export function septuagintDatasetPath(): string {
   return `${DATASETS_DIRECTORY}/words/septuagint.json`;
