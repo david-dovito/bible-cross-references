@@ -8,6 +8,8 @@ import { createCachedLoader, type CachedLoader } from '../../shared/lib/cached-l
 import { loadTranslation } from '../../translations/load-translation.ts';
 import { getTranslationManifest } from '../../translations/registry.ts';
 import type { Translation } from '../../translations/translation.ts';
+import { loadEvidence, type EvidenceDataset } from '../../links/load-evidence.ts';
+import { loadLexicon, type LexiconDataset } from '../../words/load-lexicon.ts';
 import { loadOriginalWords, type OriginalWordsDataset } from '../../words/load-original-words.ts';
 import { getWordSourceManifest } from '../../words/registry.ts';
 import { computeVerseGenres } from './verse-genres.ts';
@@ -94,4 +96,36 @@ export function originalWordsIfLoaded(): OriginalWordsDataset | null {
 /** Forgets a failed download, so the next verse opened tries again instead of giving up. */
 export function resetOriginalWords(): void {
   originalWordsLoader.reset();
+}
+
+/**
+ * What the words mean (definitions, families, Septuagint equivalents). Fetched the first time a
+ * reader opens a word, like the words themselves are on opening a verse.
+ */
+export const lexiconLoader = createCachedLoader(async (): Promise<LexiconDataset> => {
+  const dataset = await loadLexicon();
+  loadedLexicon = dataset;
+  return dataset;
+});
+
+let loadedLexicon: LexiconDataset | null = null;
+
+export function lexiconIfLoaded(): LexiconDataset | null {
+  return loadedLexicon;
+}
+
+/**
+ * What links verses besides the cross-references (shared words, quotations, meaning). Fetched
+ * the first time a reader opens a verse, or turns on the agreement filter.
+ */
+export const evidenceLoader = createCachedLoader(async (): Promise<EvidenceDataset> => {
+  const dataset = await loadEvidence();
+  loadedEvidence = dataset;
+  return dataset;
+});
+
+let loadedEvidence: EvidenceDataset | null = null;
+
+export function evidenceIfLoaded(): EvidenceDataset | null {
+  return loadedEvidence;
 }

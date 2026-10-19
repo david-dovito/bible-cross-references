@@ -17,3 +17,18 @@ export function crossReferencesDatasetPath(id: CrossReferenceSourceId): string {
 export function originalWordsDatasetPath(id: WordSourceId): string {
   return `${DATASETS_DIRECTORY}/words/${id}.json`;
 }
+
+/** The lexicon behind the original words (definitions, families, Septuagint equivalents). */
+export function lexiconDatasetPath(): string {
+  return `${DATASETS_DIRECTORY}/words/lexicon.json`;
+}
+
+/** The Septuagint: its Greek words by KJV verse, and the Hebrew and Greek words it pairs. */
+export function septuagintDatasetPath(): string {
+  return `${DATASETS_DIRECTORY}/words/septuagint.json`;
+}
+
+/** Verse pairs and what links them: shared words, quotations, meaning, cross-references. */
+export function evidenceDatasetPath(): string {
+  return `${DATASETS_DIRECTORY}/links/evidence.json`;
+}

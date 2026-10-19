@@ -249,4 +249,72 @@ describe('importStepBibleWords', () => {
   it('rejects a file with no tagged words at all', () => {
     expect(() => build([{ language: 'hebrew', text: 'nothing here' }])).toThrow(/no tagged words/);
   });
+
+  it('rejects a verse number the chapter does not reach', () => {
+    // Genesis 1 has 31 verses; a reference past the end would otherwise land silently nowhere.
+    const text = [hebrew('Gen.1.1#01=L', '{H1961}'), hebrew('Gen.1.99#01=L', '{H1961}')].join('\n');
+    expect(() => build([{ language: 'hebrew', text }])).toThrow(/outside the kjv versification/);
+  });
+
+  it('passes over a lexicon row with no dictionary form or no gloss', () => {
+    const rows = [
+      ['G4128', 'G4128 =', 'G4128', '', 'plēthos', 'G:N-N', 'multitude'].join('\t'),
+      ['G1473', 'G1473 =', 'G1473', 'ἐγώ', 'egō', 'G:PerP', ''].join('\t'),
+      ['G2532', 'G2532 =', 'G2532', 'καί', 'kai', 'G:Conj', 'and'].join('\t'),
+    ].join('\n');
+    const dataset = importStepBibleWords(
+      [
+        {
+          language: 'greek',
+          text: [
+            greek('Act.5.14#01=NKO', 'G4128'),
+            greek('Act.5.14#02=NKO', 'G1473'),
+            greek('Act.5.14#03=NKO', 'G2532'),
+          ].join('\n'),
+        },
+      ],
+      [{ language: 'greek', text: rows }],
+      { maxVerses: 100, license: LICENSE, attribution: ATTRIBUTION, provenance: PROVENANCE },
+    );
+    // Only the complete row is shown; the other two are reported rather than shown as numbers.
+    expect(dataset.words.strongs).toEqual(['G2532']);
+    const notice = dataset.notices.find(({ message }) => message.includes('no lexicon entry'));
+    expect(notice?.count).toBe(2);
+  });
+
+  it('passes over a lexicon row whose number it cannot read', () => {
+    const rows = [
+      ['', 'not a number =', '', 'x', 'x', 'x', 'x'].join('\t'),
+      ['G2532', 'G2532 =', 'G2532', 'καί', 'kai', 'G:Conj', 'and'].join('\t'),
+    ].join('\n');
+    const dataset = importStepBibleWords(
+      [{ language: 'greek', text: greek('Act.5.14#01=NKO', 'G2532') }],
+      [{ language: 'greek', text: rows }],
+      { maxVerses: 100, license: LICENSE, attribution: ATTRIBUTION, provenance: PROVENANCE },
+    );
+    expect(dataset.words.strongs).toEqual(['G2532']);
+  });
+
+  it('rejects a lexicon with nothing usable in it at all', () => {
+    expect(() =>
+      importStepBibleWords(
+        [{ language: 'greek', text: greek('Act.5.14#01=NKO', 'G2532') }],
+        [{ language: 'greek', text: 'rubbish' }],
+        { maxVerses: 100, license: LICENSE, attribution: ATTRIBUTION, provenance: PROVENANCE },
+      ),
+    ).toThrow(/no usable entries/);
+  });
+
+  it('falls back to the extended number where the disambiguated one is not listed', () => {
+    // H1961 is tagged, but the lexicon lists that sense only under its extended number.
+    const rows = ['H1961', 'H1961A = a form of', 'H1961', 'הָיָה', 'ha.Yah', 'N:V', 'to be'].join(
+      '\t',
+    );
+    const dataset = importStepBibleWords(
+      [{ language: 'hebrew', text: hebrew('Gen.1.1#01=L', '{H1961}') }],
+      [{ language: 'hebrew', text: rows }],
+      { maxVerses: 100, license: LICENSE, attribution: ATTRIBUTION, provenance: PROVENANCE },
+    );
+    expect(dataset.words.gloss).toEqual(['to be']);
+  });
 });

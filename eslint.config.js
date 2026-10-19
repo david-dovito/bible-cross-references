@@ -6,7 +6,15 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig([
-  globalIgnores(['dist/', 'coverage/', 'data/raw/', 'public/data/']),
+  globalIgnores([
+    'dist/',
+    'coverage/',
+    'data/raw/',
+    'public/data/',
+    'tools/',
+    'test-results/',
+    'playwright-report/',
+  ]),
   js.configs.recommended,
   tseslint.configs.strictTypeChecked,
   tseslint.configs.stylisticTypeChecked,

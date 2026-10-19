@@ -8,6 +8,7 @@ import { NextIcon, PreviousIcon } from '../../shared/ui/icons.tsx';
 import { collectConnections, type Connection } from '../shared/connections.ts';
 import type { LinkFilter } from '../shared/link-filter.ts';
 import { GENRE_COLORS } from '../shared/palette.ts';
+import type { WordLayer } from '../shared/word-layer.ts';
 import { useElementSize } from '../shared/use-element-size.ts';
 import type { VizData } from '../shared/viz-data.ts';
 import { FrameScheduler, MAX_PIXEL_RATIO } from '../shared/frames.ts';
@@ -29,6 +30,8 @@ interface ThreadsStageProps {
    * marked where the chapter holds it (the selected verse keeps its own highlight).
    */
   readonly preview: Connection | null;
+  /** A word opened in the details panel: its verses, drawn in brass from the verse it is in. */
+  readonly wordLayer: WordLayer | null;
   readonly onSelect: (passage: Passage | null) => void;
 }
 
@@ -55,6 +58,7 @@ export function ThreadsStage({
   filter,
   direction,
   preview,
+  wordLayer,
   onSelect,
 }: ThreadsStageProps) {
   const { versification, translation, crossReferences, verseGenres } = data;
@@ -112,6 +116,7 @@ export function ThreadsStage({
     }
     return null;
   }, [preview, connectionsByVerse]);
+  const wordVerses = useMemo(() => new Set(wordLayer?.verses), [wordLayer]);
   const linked = preview && { start: preview.link.targetStart, end: preview.link.targetEnd };
 
   // Redraw on any input change, and on every scroll frame of the reading pane.
@@ -153,6 +158,7 @@ export function ThreadsStage({
         emphasizedVerse,
         emphasizedBook,
         emphasizedLink,
+        wordLayer,
       });
     });
     scheduler.request();
@@ -176,6 +182,7 @@ export function ThreadsStage({
     emphasizedVerse,
     emphasizedBook,
     emphasizedLink,
+    wordLayer,
   ]);
 
   // Condense the chapter header once the reader scrolls, and track the verse at the top.
@@ -297,6 +304,7 @@ export function ThreadsStage({
                   }}
                   className={styles.verse}
                   data-selected={verse === selectedVerse}
+                  data-word={wordVerses.has(verse)}
                   data-linked={linked !== null && verse >= linked.start && verse <= linked.end}
                   onPointerEnter={(event) => {
                     if (event.pointerType === 'mouse') setHoverVerse(verse);

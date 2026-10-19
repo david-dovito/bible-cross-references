@@ -166,6 +166,10 @@
   box-shadow: inset 2px 0 0 var(--color-text-muted);
 }
 
+.verse[data-word='true'] {
+  box-shadow: inset 2px 0 0 #c29a55;
+}
+
 .verse[data-selected='true'] {
   background: var(--color-surface-muted);
   box-shadow: inset 2px 0 0 var(--color-text);

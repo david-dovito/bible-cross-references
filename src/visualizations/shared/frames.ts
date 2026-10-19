@@ -28,12 +28,35 @@ export class FrameScheduler {
   }
 }
 
-/** Runs `onFrame(progress)` with an ease-out curve over `durationMs`; returns a cancel function. */
-export function animate(durationMs: number, onFrame: (progress: number) => void): () => void {
-  const start = performance.now();
+/**
+ * Runs `onFrame(progress)` over `durationMs` with an ease-out curve (or ease-in-out, for a
+ * movement that should keep an even pace through its middle); returns a cancel function.
+ *
+ * `maxStepMs` caps how far one frame may move it: a frame that comes late (the page busy with
+ * something else) then counts as one ordinary frame, so the animation slows down over a busy
+ * stretch instead of jumping past it.
+ */
+export function animate(
+  durationMs: number,
+  onFrame: (progress: number) => void,
+  {
+    maxStepMs = Infinity,
+    easing = 'out',
+  }: { readonly maxStepMs?: number; readonly easing?: 'out' | 'in-out' } = {},
+): () => void {
+  let elapsed = 0;
+  let last = performance.now();
   let frame = requestAnimationFrame(function step(now) {
-    const linear = Math.min((now - start) / durationMs, 1);
-    onFrame(1 - (1 - linear) ** 3);
+    elapsed += Math.min(now - last, maxStepMs);
+    last = now;
+    const linear = durationMs <= 0 ? 1 : Math.min(elapsed / durationMs, 1);
+    onFrame(
+      easing === 'out'
+        ? 1 - (1 - linear) ** 3
+        : linear < 0.5
+          ? 4 * linear ** 3
+          : 1 - (-2 * linear + 2) ** 3 / 2,
+    );
     if (linear < 1) {
       frame = requestAnimationFrame(step);
     }

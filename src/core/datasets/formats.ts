@@ -103,6 +103,107 @@ export interface OriginalWordsFile extends DatasetFileBase<'original-words'> {
   readonly words: OriginalWordColumns;
 }
 
+/**
+ * The meaning behind the original-language words: one entry per Strong's number (`G5046`), with
+ * its definition, its family (the words sharing its root), and, for a Greek word, the Hebrew the
+ * Septuagint used it for. `family` and `equivalents` hold positions in these same columns, read
+ * through their offsets (CSR), as in `OriginalWordColumns`.
+ */
+export interface LexiconColumns {
+  readonly strongs: readonly string[];
+  readonly lemma: readonly string[];
+  readonly transliteration: readonly string[];
+  /** Strong's definition. */
+  readonly definition: readonly string[];
+  /** How the KJV renders it. */
+  readonly renderings: readonly string[];
+  /** Its senses: Abbott-Smith's for Greek, Brown-Driver-Briggs's outline for Hebrew. */
+  readonly senses: readonly string[];
+  /** How the KJV translates it, with counts: `perfect (17), man (1)`. */
+  readonly translations: readonly string[];
+  /** How many times the KJV translates it, all told. */
+  readonly occurrences: readonly number[];
+  readonly familyOffsets: readonly number[];
+  readonly family: readonly number[];
+  readonly equivalentOffsets: readonly number[];
+  readonly equivalents: readonly number[];
+}
+
+export interface LexiconFile extends DatasetFileBase<'lexicon'> {
+  /** Carried in the file itself, like the words': it is served on its own. */
+  readonly license: LicenseInfo;
+  readonly attribution: string;
+  readonly entries: LexiconColumns;
+}
+
+/** The Greek words of the Septuagint, where each is used (as KJV verses), and their families. */
+export interface SeptuagintGreekColumns {
+  /** Key in Open Scriptures' Greek Word List (unaccented, e.g. `τελειος`). */
+  readonly key: readonly string[];
+  readonly lemma: readonly string[];
+  /** Plain Strong's number for a word the New Testament shares (`G5046`), else empty. */
+  readonly strongs: readonly string[];
+  /** A few words of English, from the Word List. */
+  readonly gloss: readonly string[];
+  readonly verseOffsets: readonly number[];
+  readonly verses: readonly number[];
+  readonly familyOffsets: readonly number[];
+  readonly family: readonly number[];
+}
+
+/**
+ * Hebrew and Greek words the Septuagint pairs: in how many lined-up verses both occur, out of how
+ * many each is in, and how much of each the word model credits to the other (in thousandths).
+ */
+export interface SeptuagintPairColumns {
+  /** Plain Strong's number (`H8549`). */
+  readonly hebrew: readonly string[];
+  /** Position in the Greek columns. */
+  readonly greek: readonly number[];
+  readonly count: readonly number[];
+  readonly hebrewVerses: readonly number[];
+  readonly greekVerses: readonly number[];
+  readonly toGreek: readonly number[];
+  readonly toHebrew: readonly number[];
+}
+
+export interface SeptuagintFile extends DatasetFileBase<'septuagint'> {
+  readonly license: LicenseInfo;
+  readonly attribution: string;
+  readonly greek: SeptuagintGreekColumns;
+  readonly pairs: SeptuagintPairColumns;
+  /** Which Septuagint verse (`Ps.50.3`) was lined up with which KJV verse. */
+  readonly alignment: { readonly greek: readonly string[]; readonly verses: readonly number[] };
+}
+
+/** What links a pair of verses, one bit each (see `scripts/data/importers/evidence.ts`). */
+export const EVIDENCE_KINDS = {
+  crossReference: 1,
+  words: 2,
+  quotation: 4,
+  meaning: 8,
+} as const;
+
+/** Verse pairs and what links them, each pair once (`first` < `second`). */
+export interface EvidenceColumns {
+  readonly first: readonly number[];
+  readonly second: readonly number[];
+  /** `EVIDENCE_KINDS` bits. */
+  readonly kinds: readonly number[];
+  /** Shared-word cosine similarity, in thousandths. */
+  readonly words: readonly number[];
+  /** Shared Greek three-word runs. */
+  readonly quotation: readonly number[];
+  /** The model's similarity, in thousandths. */
+  readonly meaning: readonly number[];
+}
+
+export interface EvidenceFile extends DatasetFileBase<'evidence'> {
+  readonly license: LicenseInfo;
+  readonly attribution: string;
+  readonly pairs: EvidenceColumns;
+}
+
 function parseProvenance(value: unknown, path: string): DatasetProvenance {
   const record = expectRecord(value, path);
   return {
@@ -206,6 +307,102 @@ export function parseOriginalWordsFile(
       gloss: expectStringArray(words['gloss'], 'words.gloss'),
       offsets: expectIntegerArray(words['offsets'], 'words.offsets'),
       verses: expectIntegerArray(words['verses'], 'words.verses'),
+    },
+  };
+}
+
+export function parseLexiconFile(json: unknown, versification: VersificationId): LexiconFile {
+  const { record, base } = parseFileBase(json, 'lexicon', versification);
+  const entries = expectRecord(record['entries'], 'entries');
+  const license = expectRecord(record['license'], 'license');
+  const strings = (key: string) => expectStringArray(entries[key], `entries.${key}`);
+  const integers = (key: string) => expectIntegerArray(entries[key], `entries.${key}`);
+  return {
+    ...base,
+    license: {
+      name: expectString(license['name'], 'license.name'),
+      url: expectString(license['url'], 'license.url'),
+    },
+    attribution: expectString(record['attribution'], 'attribution'),
+    entries: {
+      strongs: strings('strongs'),
+      lemma: strings('lemma'),
+      transliteration: strings('transliteration'),
+      definition: strings('definition'),
+      renderings: strings('renderings'),
+      senses: strings('senses'),
+      translations: strings('translations'),
+      occurrences: integers('occurrences'),
+      familyOffsets: integers('familyOffsets'),
+      family: integers('family'),
+      equivalentOffsets: integers('equivalentOffsets'),
+      equivalents: integers('equivalents'),
+    },
+  };
+}
+
+export function parseSeptuagintFile(json: unknown, versification: VersificationId): SeptuagintFile {
+  const { record, base } = parseFileBase(json, 'septuagint', versification);
+  const license = expectRecord(record['license'], 'license');
+  const greek = expectRecord(record['greek'], 'greek');
+  const pairs = expectRecord(record['pairs'], 'pairs');
+  const alignment = expectRecord(record['alignment'], 'alignment');
+  const strings = (from: Readonly<Record<string, unknown>>, path: string, key: string) =>
+    expectStringArray(from[key], `${path}.${key}`);
+  const integers = (from: Readonly<Record<string, unknown>>, path: string, key: string) =>
+    expectIntegerArray(from[key], `${path}.${key}`);
+  return {
+    ...base,
+    license: {
+      name: expectString(license['name'], 'license.name'),
+      url: expectString(license['url'], 'license.url'),
+    },
+    attribution: expectString(record['attribution'], 'attribution'),
+    greek: {
+      key: strings(greek, 'greek', 'key'),
+      lemma: strings(greek, 'greek', 'lemma'),
+      strongs: strings(greek, 'greek', 'strongs'),
+      gloss: strings(greek, 'greek', 'gloss'),
+      verseOffsets: integers(greek, 'greek', 'verseOffsets'),
+      verses: integers(greek, 'greek', 'verses'),
+      familyOffsets: integers(greek, 'greek', 'familyOffsets'),
+      family: integers(greek, 'greek', 'family'),
+    },
+    pairs: {
+      hebrew: strings(pairs, 'pairs', 'hebrew'),
+      greek: integers(pairs, 'pairs', 'greek'),
+      count: integers(pairs, 'pairs', 'count'),
+      hebrewVerses: integers(pairs, 'pairs', 'hebrewVerses'),
+      greekVerses: integers(pairs, 'pairs', 'greekVerses'),
+      toGreek: integers(pairs, 'pairs', 'toGreek'),
+      toHebrew: integers(pairs, 'pairs', 'toHebrew'),
+    },
+    alignment: {
+      greek: strings(alignment, 'alignment', 'greek'),
+      verses: integers(alignment, 'alignment', 'verses'),
+    },
+  };
+}
+
+export function parseEvidenceFile(json: unknown, versification: VersificationId): EvidenceFile {
+  const { record, base } = parseFileBase(json, 'evidence', versification);
+  const license = expectRecord(record['license'], 'license');
+  const pairs = expectRecord(record['pairs'], 'pairs');
+  const integers = (key: string) => expectIntegerArray(pairs[key], `pairs.${key}`);
+  return {
+    ...base,
+    license: {
+      name: expectString(license['name'], 'license.name'),
+      url: expectString(license['url'], 'license.url'),
+    },
+    attribution: expectString(record['attribution'], 'attribution'),
+    pairs: {
+      first: integers('first'),
+      second: integers('second'),
+      kinds: integers('kinds'),
+      words: integers('words'),
+      quotation: integers('quotation'),
+      meaning: integers('meaning'),
     },
   };
 }

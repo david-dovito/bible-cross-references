@@ -32,20 +32,64 @@ jobs:
         with:
           path: data/raw
           key: raw-data-${{ hashFiles('data/sources.json') }}
+      # Types, lint, formatting and the unit tests with their coverage thresholds (98% of
+      # statements, lines and functions — see vite.config.ts). Any one of them failing fails
+      # the job, and with it the pull request.
       - run: npm run check
       - run: npm run build
+      - name: Keep the built site for the end-to-end tests
+        uses: actions/upload-artifact@v7
+        with:
+          name: site
+          path: dist
+          retention-days: 1
       - name: Keep the built site for deployment
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v5
         with:
           path: dist
 
-  # Publishes main to trekhleb.dev/bible-cross-references/, once every check has passed. The domain
+  # The flows a reader actually goes through, in a real browser against the built site: reading a
+  # chapter, following a cross-reference, the original-language words, switching translation, the
+  # layout at twelve widths, and the offline cache — including that a new release replaces an old
+  # one, which is the one failure that could strand an audience on a stale version.
+  e2e:
+    name: End-to-end tests
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Take the site the check job built
+        uses: actions/download-artifact@v8
+        with:
+          name: site
+          path: dist
+      # Only Chromium: the suite tests this app's behaviour, not browser differences, and the
+      # service worker and WebGL both need a real engine rather than three of them.
+      - name: Install the browser
+        run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - name: Keep the report when something failed
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7
+
+  # Publishes main to david-dovito.github.io/bible-cross-references/, once every check has passed. The domain
   # comes from the owner's user site; builds already use the /bible-cross-references/ base path.
   deploy:
     name: Deploy to GitHub Pages
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    needs: check
+    needs: [check, e2e]
     runs-on: ubuntu-latest
     permissions:
       pages: write

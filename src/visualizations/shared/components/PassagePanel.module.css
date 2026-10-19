@@ -505,3 +505,201 @@
     display: none;
   }
 }
+
+/* A licensed translation's notice (the NASB's, from The Lockman Foundation), after the panel. */
+.licenseNotice {
+  margin: var(--space-4) 0 var(--space-2);
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+/* An opened word's meaning (the lexicon), and the words a reader can add to what is followed. */
+.meaning {
+  display: grid;
+  gap: var(--space-3);
+  margin-inline-start: var(--space-2);
+  padding-inline-start: var(--space-4);
+  border-inline-start: 1px solid var(--color-border);
+}
+
+.definition p {
+  margin: 0 0 var(--space-1);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.senses {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.renderings,
+.meaningSummary,
+.choicesTitle {
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+}
+
+.meaningSummary,
+.choicesTitle {
+  margin: 0;
+}
+
+.choicesTitle {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.choicesAll {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-accent);
+  font: inherit;
+  cursor: pointer;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-block-start: var(--space-1);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.chip[aria-pressed='true'] {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.chipCount,
+.alsoLinked {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.alsoLinked {
+  margin-inline-start: var(--space-2);
+  color: var(--color-accent);
+}
+
+.onArcs {
+  color: var(--color-accent);
+}
+
+.wordMore {
+  margin-inline-start: var(--space-2);
+}
+
+.chip {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  border-radius: var(--radius);
+  text-align: start;
+}
+
+.chipWord {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-1);
+}
+
+.chipGloss {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+/* What links a pair: one badge per kind of evidence. */
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.badge {
+  padding: 0 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-text-muted);
+  font-size: 0.6875rem;
+  line-height: 1.6;
+}
+
+.badge[data-kind='quotation'] {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.badge[data-kind='meaning'] {
+  border-style: dashed;
+}
+
+/* Reordering (SortableSections): a grip at the band's start, in its padding. */
+.sortable {
+  display: grid;
+  gap: var(--space-4);
+}
+
+/* A section with nothing to show for this passage leaves no gap behind. */
+.sortable:empty {
+  display: none;
+}
+
+.sortable[data-dragging='true'] {
+  opacity: 0.85;
+  outline: 1px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}
+
+.sectionHeader:has(.grip) .sectionToggle {
+  padding-inline-start: calc(var(--space-4) + 10px);
+}
+
+.grip {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  z-index: 1;
+  inline-size: calc(var(--space-4) + 12px);
+  padding: 0;
+  border: 0;
+  background-color: transparent;
+  /* Six dots, drawn rather than an icon: two columns of three. */
+  background-image: radial-gradient(circle, var(--color-text-muted) 1.2px, transparent 1.6px);
+  background-size: 5px 5px;
+  background-position: center;
+  background-repeat: repeat;
+  /* Only a 10 × 15 px patch of dots, centred. */
+  mask: linear-gradient(#000 0 0) center / 10px 15px no-repeat;
+  cursor: grab;
+  touch-action: none;
+}
+
+.grip:active {
+  cursor: grabbing;
+}
+
+.grip:focus-visible {
+  mask: none;
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+  background-size: 5px 5px;
+}

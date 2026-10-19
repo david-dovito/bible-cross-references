@@ -14,6 +14,54 @@ export interface AxisPaint {
   readonly hover: VerseIndexRange | null;
   /** A passage a previewed link points to: a band quieter than hover's, under the focus. */
   readonly passage: VerseIndexRange | null;
+  /** References into and out of each verse, with the count that fills the tallest bar. */
+  readonly referenceCounts: ReferenceCounts | null;
+}
+
+export interface ReferenceCounts {
+  readonly perVerse: ArrayLike<number>;
+  readonly cap: number;
+}
+
+/** Tallest histogram bar, and where it starts under the genre labels. */
+const HISTOGRAM_HEIGHT = 48;
+const HISTOGRAM_OFFSET = 42;
+
+/**
+ * How often each verse is referenced, either way (after Chris Harrison's BibleViz): bars hang
+ * from a rule under the labels, one column per pixel, taller for the verse with most references
+ * in it, in the book's genre color.
+ */
+function paintHistogram(
+  context: CanvasRenderingContext2D,
+  { layout, view, versification, referenceCounts }: AxisPaint,
+  along: (verse: number) => number,
+): void {
+  if (!referenceCounts || layout.orientation !== 'horizontal') return;
+  const top = layout.baseline + BAR_OFFSET + BAR_THICKNESS + HISTOGRAM_OFFSET;
+  const perPixel = (view.end - view.start) / (layout.axisEnd - layout.axisStart);
+  for (const book of BOOKS) {
+    const range = versification.bookRange(book.id);
+    const from = Math.max(along(range.start), layout.axisStart);
+    const to = Math.min(along(range.end + 1), layout.axisEnd);
+    context.fillStyle = elementAt(GENRE_HEX, getBookGenre(book.id).ordinal);
+    context.globalAlpha = book.ordinal % 2 === 0 ? 0.95 : 0.7;
+    for (let x = Math.floor(from); x < to; x += 1) {
+      const first = Math.max(
+        range.start,
+        Math.floor(view.start + (x - layout.axisStart) * perPixel),
+      );
+      const last = Math.min(range.end, Math.max(first, Math.ceil(first + perPixel) - 1));
+      let peak = 0;
+      for (let verse = first; verse <= last; verse += 1) {
+        peak = Math.max(peak, referenceCounts.perVerse[verse] ?? 0);
+      }
+      if (peak === 0) continue;
+      const height = Math.max(1, Math.min(1, peak / referenceCounts.cap) * HISTOGRAM_HEIGHT);
+      context.fillRect(x, top, 1, height);
+    }
+  }
+  context.globalAlpha = 1;
 }
 
 const TEXT = '#ecebe6';
@@ -110,6 +158,7 @@ export function paintAxis(context: CanvasRenderingContext2D, paint: AxisPaint): 
   highlight(paint.hover, 'rgb(236 235 230 / 0.45)', 1.5);
   highlight(paint.focus, TEXT, 2);
 
+  paintHistogram(context, paint, along);
   paintBookLabels(context, paint, along);
   if (layout.orientation === 'horizontal') {
     paintGenreLabels(context, paint, along);

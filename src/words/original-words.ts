@@ -1,5 +1,6 @@
 import type { VerseIndex } from '../core/bible/verse-ref.ts';
 import type { OriginalWordColumns } from '../core/datasets/formats.ts';
+import { plainStrongs } from './lexicon.ts';
 
 /** One dictionary word of the Hebrew or Greek, as shown beside a verse. */
 export interface OriginalWord {
@@ -26,6 +27,8 @@ export class OriginalWordIndex {
   /** CSR over verses: the words of verse `v` are at `#offsets[v]` to `#offsets[v + 1] - 1`. */
   readonly #offsets: Int32Array;
   readonly #words: Int32Array;
+  /** Words by plain Strong's number (`G5046`): one number can be tagged in several senses. */
+  #byPlainStrongs: Map<string, number[]> | null = null;
 
   constructor(columns: OriginalWordColumns, verseCount: number) {
     this.#columns = columns;
@@ -94,6 +97,22 @@ export class OriginalWordIndex {
       words.push(this.#wordAt(this.#words[at] ?? 0));
     }
     return words.sort((a, b) => a.verseCount - b.verseCount || a.strongs.localeCompare(b.strongs));
+  }
+
+  /**
+   * The dataset's words filed under a plain Strong's number (`H1254` gives `H1254A` and
+   * `H1254B`), for following a lexicon entry to the verses that use it.
+   */
+  wordsWithStrongs(plain: string): readonly OriginalWord[] {
+    if (!this.#byPlainStrongs) {
+      const byPlain = new Map<string, number[]>();
+      this.#columns.strongs.forEach((strongs, index) => {
+        const key = plainStrongs(strongs);
+        byPlain.set(key, [...(byPlain.get(key) ?? []), index]);
+      });
+      this.#byPlainStrongs = byPlain;
+    }
+    return (this.#byPlainStrongs.get(plain) ?? []).map((index) => this.#wordAt(index));
   }
 
   /** Every verse that uses a word, in canonical order. */

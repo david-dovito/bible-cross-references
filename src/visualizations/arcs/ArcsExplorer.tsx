@@ -19,8 +19,11 @@ import { DEFAULT_LINK_FILTER, selectLinks } from '../shared/link-filter.ts';
 import { summarizeLinks } from '../shared/link-summary.ts';
 import type { Passage } from '../../core/bible/passage.ts';
 import type { Connection } from '../shared/connections.ts';
+import type { WordLayer } from '../shared/word-layer.ts';
 import type { VisualizationProps } from '../visualization.ts';
 import { ArcsStage } from './ArcsStage.tsx';
+import { useEvidence } from '../shared/use-evidence.ts';
+import controls from '../shared/components/controls.module.css';
 
 const INSPIRATION = {
   title: 'Bible Cross-References',
@@ -41,10 +44,26 @@ export function ArcsExplorer({
   shareUrl,
 }: VisualizationProps) {
   const { index } = data.crossReferences;
-  const linkIds = useMemo(
+  // Only the cross-references that another kind of evidence agrees with (shared words, a
+  // quotation, the model's meaning): the explorer's own filter, kept out of the address.
+  const [agreementOnly, setAgreementOnly] = useState(false);
+  const evidence = useEvidence(agreementOnly);
+  const filtered = useMemo(
     () => selectLinks(index, data.verseGenres, filter),
     [index, data.verseGenres, filter],
   );
+  const linkIds = useMemo(() => {
+    if (!agreementOnly || !evidence) {
+      return filtered;
+    }
+    return filtered.filter((id) =>
+      evidence.evidence.agrees(
+        index.sources[id] ?? 0,
+        index.targetStarts[id] ?? 0,
+        index.targetEnds[id] ?? 0,
+      ),
+    );
+  }, [agreementOnly, evidence, filtered, index]);
   const summary = useMemo(
     () => summarizeLinks(index, linkIds, data.verseGenres),
     [index, linkIds, data.verseGenres],
@@ -58,6 +77,10 @@ export function ArcsExplorer({
     readonly connection: Connection;
   } | null>(null);
   const previewed = preview?.passage === passage ? preview.connection : null;
+  // A word opened in the panel, drawn over the arcs; it belongs to the passage it was opened on.
+  const [wordLayer, setWordLayer] = useState<WordLayer | null>(null);
+  const shownWords =
+    wordLayer && passage?.kind === 'verse' && passage.verse === wordLayer.verse ? wordLayer : null;
 
   return (
     <VizPage
@@ -74,7 +97,23 @@ export function ArcsExplorer({
             onChange={onFilterChange}
             shownLinks={linkIds.length}
             totalLinks={index.linkCount}
-          />
+          >
+            <label className={controls.choice}>
+              <input
+                type="checkbox"
+                checked={agreementOnly}
+                onChange={(event) => {
+                  setAgreementOnly(event.target.checked);
+                }}
+              />
+              Only links something else agrees with
+            </label>
+            <p className={controls.hint}>
+              {agreementOnly && !evidence
+                ? 'Loading the evidence…'
+                : 'Keeps a cross-reference only where the two verses also share rare words, one quotes the other, or the meaning model finds them close.'}
+            </p>
+          </FiltersMenu>
         </>
       }
       panel={
@@ -87,6 +126,7 @@ export function ArcsExplorer({
             onSelect={onNavigate}
             onClose={closePanel}
             shareUrl={shareUrl}
+            onWordLayer={setWordLayer}
             onPreview={(connection) => {
               setPreview(connection && { passage, connection });
             }}
@@ -101,6 +141,7 @@ export function ArcsExplorer({
         filter={filter}
         focus={passage}
         preview={previewed}
+        wordLayer={shownWords}
         onSelect={onNavigate}
       />
       <LinkStats

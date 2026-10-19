@@ -3,7 +3,7 @@ import { useCallback, useSyncExternalStore } from 'react';
 /**
  * Small per-reader preferences, kept in localStorage so they last between visits.
  *
- * - The origin (trekhleb.dev) is shared with other sites, so every key is namespaced.
+ * - The origin (github.io) is shared with other sites, so every key is namespaced.
  * - Storage can be unavailable (private browsing, blocked site data): values then live in memory
  *   for the visit.
  * - Every component using a preference sees its changes at once, including other tabs.

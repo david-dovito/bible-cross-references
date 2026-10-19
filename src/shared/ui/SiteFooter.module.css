@@ -72,11 +72,32 @@
   }
 }
 
-/* The narrowest phones still in use: the credit is the one part of the line that cannot be
-   shortened (it is the licence), so the last few pixels come off the page's edges instead. */
+/* Narrow phones. The line is set in the reader's own UI font, which is a different width on
+   every system — between the narrowest and widest of them there is about a tenth of the line in
+   it, and at these widths a tenth is the difference between one line and two. So rather than fit
+   exactly and hope, the year goes: the licence credit cannot be shortened, the name is still
+   there in the link beside it, and what is left has room to spare on any font. */
+@media (max-width: 23.99rem) {
+  .copyright {
+    display: none;
+  }
+}
+
+/* The narrowest phones still in use: the last few pixels come off the page's edges too. */
 @media (max-width: 22.49rem) {
   .footer {
     column-gap: var(--space-1);
     padding-inline: var(--space-2);
+  }
+}
+
+/* Wider than a phone but narrow still (a tablet held upright): the mark says GitHub on its own. */
+@media (max-width: 53.99rem) {
+  .sourceLabel {
+    display: none;
+  }
+
+  .source {
+    margin-inline-end: 0;
   }
 }

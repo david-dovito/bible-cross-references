@@ -1,5 +1,5 @@
 import { BOOKS, type BookId } from '../../../src/core/bible/books.ts';
-import { toOsisId, type VerseIndex } from '../../../src/core/bible/verse-ref.ts';
+import { parseOsisId, toOsisId, type VerseIndex } from '../../../src/core/bible/verse-ref.ts';
 import { CANONICAL_VERSIFICATION } from '../../../src/core/bible/versification.ts';
 import {
   DATASET_SCHEMA_VERSION,
@@ -112,12 +112,21 @@ function cleanVerseText(text: string): string {
     .trim();
 }
 
+/**
+ * Verses a translation numbers differently from the KJV, by OSIS ID: where the file has them, and
+ * where the KJV has them. The World English Bible, for one, prints the doxology of Romans at
+ * 14:24–26 and leaves 16:25 empty; the KJV has it at 16:25–27.
+ */
+export type VerseRenumbering = Readonly<Record<string, string>>;
+
 export function importEbibleVerseLines(
   text: string,
   translationId: TranslationId,
   provenance: DatasetProvenance,
+  renumbering: VerseRenumbering = {},
 ): TranslationTextFile {
   const versification = CANONICAL_VERSIFICATION;
+  const moved: string[] = [];
   const verses = new Array<string | undefined>(versification.verseCount).fill(undefined);
 
   stripByteOrderMark(text)
@@ -138,7 +147,15 @@ export function importEbibleVerseLines(
       if (book === undefined) {
         throw new Error(`${translationId} line ${lineNumber}: unknown book code "${code}".`);
       }
-      const ref = { book, chapter: Number(chapter), verse: Number(verse) };
+      const given = { book, chapter: Number(chapter), verse: Number(verse) };
+      const target = renumbering[toOsisId(given)];
+      const ref = target === undefined ? given : parseOsisId(target);
+      if (ref === undefined) {
+        throw new Error(`${translationId}: renumbering target "${target ?? ''}" is not a verse.`);
+      }
+      if (target !== undefined) {
+        moved.push(`${toOsisId(given)} → ${target}`);
+      }
       const index = versification.indexOf(ref);
       if (index === undefined) {
         // Translations that number verses differently (e.g. the World English Bible moves the
@@ -146,6 +163,9 @@ export function importEbibleVerseLines(
         throw new Error(
           `${translationId} line ${lineNumber}: ${toOsisId(ref)} is not in the KJV versification.`,
         );
+      }
+      if (verses[index] !== undefined && cleanVerseText(verseText) === '' && moved.length > 0) {
+        return; // The empty place a renumbered verse was moved out of.
       }
       if (verses[index] !== undefined) {
         throw new Error(`${translationId} line ${lineNumber}: duplicate verse ${toOsisId(ref)}.`);
@@ -176,8 +196,11 @@ export function importEbibleVerseLines(
     schemaVersion: DATASET_SCHEMA_VERSION,
     versification: versification.id,
     provenance,
-    notices:
-      omitted.length > 0
+    notices: [
+      ...(moved.length > 0
+        ? [createNotice('info', 'Verses renumbered to the KJV versification.', moved)]
+        : []),
+      ...(omitted.length > 0
         ? [
             createNotice(
               'info',
@@ -186,7 +209,8 @@ export function importEbibleVerseLines(
               omitted,
             ),
           ]
-        : [],
+        : []),
+    ],
     translationId,
     verses: complete,
   };

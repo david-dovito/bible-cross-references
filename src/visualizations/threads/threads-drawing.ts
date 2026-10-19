@@ -5,6 +5,7 @@ import { elementAt } from '../../core/lib/array.ts';
 import type { Connection } from '../shared/connections.ts';
 import { GENRE_HEX } from '../shared/palette.ts';
 import { voteWeight } from '../shared/vote-weight.ts';
+import type { WordLayer } from '../shared/word-layer.ts';
 import type { SpineLayout } from './spine-layout.ts';
 
 /** Where a verse of the reading pane sits, relative to the canvas top. */
@@ -31,7 +32,12 @@ export interface ThreadsDrawing {
   readonly emphasizedBook: BookId | null;
   /** A link pointed at in the details panel: it alone stands out. */
   readonly emphasizedLink: number | null;
+  /** A word opened in the details panel: brass threads from its verse to every verse using it. */
+  readonly wordLayer: WordLayer | null;
 }
+
+/** The brass of the word layer in Arcs (arc-scene.ts). */
+const BRASS = '#c29a55';
 
 const TEXT = '#ecebe6';
 const MUTED = '#9a9890';
@@ -49,6 +55,7 @@ export function spineBar(drawing: Pick<ThreadsDrawing, 'gutterWidth' | 'compact'
 export function drawThreads(context: CanvasRenderingContext2D, drawing: ThreadsDrawing): void {
   context.clearRect(0, 0, drawing.width, drawing.height);
   drawConnections(context, drawing);
+  drawWordThreads(context, drawing);
   drawSpine(context, drawing);
 }
 
@@ -110,6 +117,34 @@ function drawConnections(context: CanvasRenderingContext2D, drawing: ThreadsDraw
     // A landing tick just left of the spine bar.
     context.fillStyle = thread.color;
     context.fillRect(bar.left - 4, thread.target - 0.5, 4, 1);
+  }
+  context.globalAlpha = 1;
+}
+
+function drawWordThreads(context: CanvasRenderingContext2D, drawing: ThreadsDrawing): void {
+  const { wordLayer, spine, gutterWidth } = drawing;
+  if (!wordLayer) return;
+  // The opened verse may be scrolled out of view: its threads then leave from the nearer edge.
+  const visible = drawing.anchors.find((anchor) => anchor.verse === wordLayer.verse);
+  const first = drawing.anchors[0];
+  const origin = visible ?? {
+    verse: wordLayer.verse,
+    y: first && wordLayer.verse < first.verse ? 0 : drawing.height,
+  };
+  const bar = spineBar(drawing);
+  const bend = gutterWidth * 0.55;
+  context.strokeStyle = BRASS;
+  context.fillStyle = BRASS;
+  context.lineWidth = 1.4;
+  for (const verse of wordLayer.verses) {
+    if (verse === wordLayer.verse) continue;
+    const target = spine.yOf(verse);
+    context.globalAlpha = 0.8;
+    context.beginPath();
+    context.moveTo(0, origin.y);
+    context.bezierCurveTo(bend, origin.y, gutterWidth - bend, target, bar.left, target);
+    context.stroke();
+    context.fillRect(bar.left - 5, target - 0.75, 5, 1.5);
   }
   context.globalAlpha = 1;
 }

@@ -1,0 +1,295 @@
+import { act, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { afterEach, describe, expect, it, vi, beforeAll } from 'vitest';
+import { DebugPage } from '../features/debug/DebugPage.tsx';
+import { debugDataLoader } from '../features/debug/debug-data.ts';
+import { mount } from '../shared/lib/mount.tsx';
+import {
+  createCrossReferenceColumns,
+  createTranslationFile,
+  PROVENANCE,
+  verseIndex,
+} from '../test-utils/fixtures.ts';
+import {
+  resetShownData,
+  VizDataBoundary,
+} from '../visualizations/shared/components/VizDataBoundary.tsx';
+import { VizPage } from '../visualizations/shared/components/VizPage.tsx';
+import { vizCoreLoader, resetTranslations } from '../visualizations/shared/viz-data.ts';
+import { ViewSwitch } from './ViewSwitch.tsx';
+import { VIEWS } from './views.ts';
+
+const GEN_1_1 = verseIndex('Gen', 1, 1);
+
+const CROSS_REFERENCES = {
+  format: 'cross-references',
+  schemaVersion: 1,
+  versification: 'kjv',
+  provenance: PROVENANCE,
+  notices: [],
+  sourceId: 'openbible',
+  sourceRowCount: 1,
+  links: createCrossReferenceColumns([{ from: GEN_1_1, to: GEN_1_1 + 1, votes: 5 }]),
+};
+
+/**
+ * Renders something that suspends, waiting for it to settle before asserting. The render has to
+ * happen inside an awaited `act`, or React stays on the loading screen and never reaches the
+ * data — or the error boundary.
+ */
+async function renderSuspending(node: React.ReactNode): Promise<void> {
+  await act(async () => {
+    render(node);
+    await Promise.resolve();
+  });
+}
+
+/** Serves the datasets, or fails every request. */
+function serve({ failing = false } = {}) {
+  const fetch = vi.fn((input: string | URL) => {
+    if (failing) {
+      return Promise.reject(new Error('offline'));
+    }
+    const body = String(input).includes('cross-references')
+      ? CROSS_REFERENCES
+      : createTranslationFile();
+    return Promise.resolve(new Response(JSON.stringify(body)));
+  });
+  vi.stubGlobal('fetch', fetch);
+  return fetch;
+}
+
+// The views load on demand; loading them up front keeps a test from ending while one is still on
+// its way (which tears the environment down under it).
+beforeAll(async () => {
+  await import('../visualizations/arcs/index.ts');
+  await import('../visualizations/threads/index.ts');
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vizCoreLoader.reset();
+  resetShownData();
+  resetTranslations();
+  debugDataLoader.reset();
+  document.body.innerHTML = '';
+  vi.restoreAllMocks();
+});
+
+describe('mount', () => {
+  it('renders the page into the root, with one install guide beside it', async () => {
+    document.body.innerHTML = '<div id="root"></div>';
+    await act(async () => {
+      mount(<p>Hello</p>);
+      await Promise.resolve();
+    });
+    expect(document.body.textContent).toContain('Hello');
+    expect(document.querySelectorAll('dialog')).toHaveLength(1);
+  });
+
+  it('refuses to start without a root to render into', () => {
+    expect(() => {
+      mount(<p>Hello</p>);
+    }).toThrow(/#root/);
+  });
+});
+
+describe('VizDataBoundary', () => {
+  it('shows the data once it has loaded', async () => {
+    serve();
+    await renderSuspending(
+      <VizDataBoundary>{(core) => <p>{core.versification.verseCount} verses</p>}</VizDataBoundary>,
+    );
+    expect(screen.getByText(/31102 verses/)).toBeDefined();
+  });
+
+  it('waits with a loading screen that says what is coming', () => {
+    serve();
+    render(<VizDataBoundary>{() => <p>done</p>}</VizDataBoundary>);
+    expect(screen.getByText(/Loading 31,102 verses/)).toBeDefined();
+  });
+
+  it('explains a failed download and offers to try again', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    serve({ failing: true });
+    await renderSuspending(<VizDataBoundary>{() => <p>done</p>}</VizDataBoundary>);
+    const alert = await screen.findByRole('alert');
+    expect(alert.textContent).toContain('offline');
+    expect(screen.getByRole('button', { name: /Retry/ })).toBeDefined();
+  });
+
+  it('forgets the failure when retried, so the download starts over', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const fetch = serve({ failing: true });
+    await renderSuspending(<VizDataBoundary>{() => <p>done</p>}</VizDataBoundary>);
+    await screen.findByRole('button', { name: /Retry/ });
+    const before = fetch.mock.calls.length;
+    await userEvent.click(screen.getByRole('button', { name: /Retry/ }));
+    await waitFor(() => {
+      expect(fetch.mock.calls.length).toBeGreaterThan(before);
+    });
+  });
+});
+
+describe('VizPage', () => {
+  it('lays out the masthead, the controls, the stage and the credits', () => {
+    render(
+      <VizPage
+        masthead={<h1>Title</h1>}
+        controls={<button type="button">Filter</button>}
+        credits={<span>Credits</span>}
+      >
+        <canvas />
+      </VizPage>,
+    );
+    expect(screen.getByRole('heading', { name: 'Title' })).toBeDefined();
+    expect(screen.getByRole('button', { name: 'Filter' })).toBeDefined();
+    expect(screen.getByText('Credits')).toBeDefined();
+    expect(screen.getByRole('main')).toBeDefined();
+  });
+
+  it('has no details panel until there is something to show', () => {
+    render(
+      <VizPage credits={<span>Credits</span>}>
+        <canvas />
+      </VizPage>,
+    );
+    expect(screen.queryByLabelText('Details')).toBeNull();
+  });
+
+  it('shows the details panel, with a handle to open it fully', () => {
+    render(
+      <VizPage credits={<span>Credits</span>} panel={<p>About this verse</p>}>
+        <canvas />
+      </VizPage>,
+    );
+    expect(screen.getByLabelText('Details')).toBeDefined();
+    expect(screen.getByRole('button', { name: 'Expand details' })).toBeDefined();
+  });
+
+  it('opens and closes the sheet from its handle', async () => {
+    render(
+      <VizPage credits={<span>Credits</span>} panel={<p>About this verse</p>}>
+        <canvas />
+      </VizPage>,
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Expand details' }));
+    expect(screen.getByRole('button', { name: 'Collapse details' })).toBeDefined();
+  });
+});
+
+describe('ViewSwitch', () => {
+  it('offers every visualization, marking the one on screen', () => {
+    render(
+      <ViewSwitch
+        views={VIEWS}
+        current="arcs"
+        hrefOf={(view) => `/${view.path}`}
+        onOpen={vi.fn()}
+      />,
+    );
+    expect(screen.getAllByRole('link')).toHaveLength(VIEWS.length);
+    expect(screen.getByRole('link', { name: 'Arcs' }).getAttribute('aria-current')).toBe('page');
+  });
+
+  it('opens a view in place, without loading the page again', async () => {
+    const onOpen = vi.fn();
+    render(
+      <ViewSwitch
+        views={VIEWS}
+        current="arcs"
+        hrefOf={(view) => `/${view.path}`}
+        onOpen={onOpen}
+      />,
+    );
+    await userEvent.click(screen.getByRole('link', { name: 'Threads' }));
+    expect(onOpen).toHaveBeenCalledWith(expect.objectContaining({ id: 'threads' }));
+  });
+
+  it('keeps a real address on each link, so they can be opened in a tab', () => {
+    render(
+      <ViewSwitch
+        views={VIEWS}
+        current="arcs"
+        hrefOf={(view) => `/${view.path}`}
+        onOpen={vi.fn()}
+      />,
+    );
+    expect(screen.getByRole('link', { name: 'Threads' }).getAttribute('href')).toBe('/threads/');
+  });
+});
+
+describe('the views', () => {
+  it('starts with the home page, and gives every other view a path of its own', () => {
+    expect(VIEWS[0].path).toBe('');
+    const paths = VIEWS.map((view) => view.path);
+    expect(new Set(paths).size).toBe(paths.length);
+  });
+
+  it('names each view for its switch and for the panel’s link', () => {
+    for (const view of VIEWS) {
+      expect(view.title.length).toBeGreaterThan(0);
+      expect(view.shortTitle.length).toBeGreaterThan(0);
+      expect(view.openLabel.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe('DebugPage', () => {
+  it('lists its sections and waits for the datasets', () => {
+    vi.spyOn(debugDataLoader, 'load').mockReturnValue(new Promise(() => undefined));
+    render(<DebugPage />);
+    expect(screen.getByRole('navigation', { name: 'Sections' })).toBeDefined();
+    expect(screen.getByText(/Loading datasets/)).toBeDefined();
+    expect(screen.getAllByRole('listitem').length).toBeGreaterThan(3);
+  });
+
+  it('shows the dashboard once the datasets are there', async () => {
+    serve();
+    debugDataLoader.reset();
+    await renderSuspending(<DebugPage />);
+    expect(screen.getByText('Dataset files')).toBeDefined();
+  });
+
+  it('explains a failed load and offers to retry', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    vi.spyOn(debugDataLoader, 'load').mockRejectedValue(new Error('no datasets'));
+    await renderSuspending(<DebugPage />);
+    expect(await screen.findByRole('alert')).toBeDefined();
+    expect(screen.getByText('no datasets')).toBeDefined();
+    expect(screen.getByRole('button', { name: /Retry/ })).toBeDefined();
+  });
+
+  it('starts the load again when retried', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const load = vi.spyOn(debugDataLoader, 'load').mockRejectedValue(new Error('no datasets'));
+    const reset = vi.spyOn(debugDataLoader, 'reset');
+    await renderSuspending(<DebugPage />);
+    await screen.findByRole('button', { name: /Retry/ });
+    await userEvent.click(screen.getByRole('button', { name: /Retry/ }));
+    expect(reset).toHaveBeenCalled();
+    expect(load.mock.calls.length).toBeGreaterThan(1);
+  });
+});
+
+describe('the debug dataset loader', () => {
+  it('loads the default text and every registered source together', async () => {
+    const fetch = serve();
+    debugDataLoader.reset();
+    const data = await debugDataLoader.load();
+    expect(data.translation.translation.manifest.id).toBe('bsb');
+    expect(data.crossReferences).toHaveLength(1);
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('the visualization registry', () => {
+  it('describes each view with an icon and a lazily loaded component', async () => {
+    const { arcs } = await import('../visualizations/arcs/index.ts');
+    const { threads } = await import('../visualizations/threads/index.ts');
+    for (const view of [arcs, threads]) {
+      expect(typeof view.icon).toBe('function');
+      expect(view.Component).toBeDefined();
+    }
+  });
+});

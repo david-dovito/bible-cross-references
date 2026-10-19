@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment -- matchers return any */
 import { describe, expect, it } from 'vitest';
 import { BOOKS } from '../../../src/core/bible/books.ts';
 import { KJV_CHAPTER_VERSE_COUNTS } from '../../../src/core/bible/kjv-versification.ts';
@@ -42,6 +43,33 @@ describe('importEbibleVerseLines', () => {
       PROVENANCE,
     );
     expect(file.verses[0]).toBe('In the beginning was the Word.');
+  });
+
+  it('moves verses a translation numbers differently onto the KJV numbering', () => {
+    // The World English Bible's doxology of Romans: at 14:24–26, with 16:25 left empty.
+    const moved = createVerseLines((line) => {
+      if (line.startsWith('ROM 14:23 ')) {
+        return [line, 'ROM 14:24 First.', 'ROM 14:25 Second.', 'ROM 14:26 Third.'].join('\n');
+      }
+      if (line.startsWith('ROM 16:25 ')) {
+        return 'ROM 16:25';
+      }
+      return line.startsWith('ROM 16:26 ') || line.startsWith('ROM 16:27 ') ? null : line;
+    });
+    const file = importEbibleVerseLines(moved, 'web', PROVENANCE, {
+      'Rom.14.24': 'Rom.16.25',
+      'Rom.14.25': 'Rom.16.26',
+      'Rom.14.26': 'Rom.16.27',
+    });
+    expect(file.verses[verseIndex('Rom', 16, 25)]).toBe('First.');
+    expect(file.verses[verseIndex('Rom', 16, 27)]).toBe('Third.');
+    expect(file.notices).toEqual([
+      expect.objectContaining({
+        level: 'info',
+        count: 3,
+        examples: expect.arrayContaining(['Rom.14.24 → Rom.16.25']),
+      }),
+    ]);
   });
 
   it('keeps omitted verses as empty text and reports them', () => {

@@ -199,4 +199,144 @@ describe('attachGestures, with a finger', () => {
     surface.dispatchEvent(mouseMenu);
     expect(mouseMenu.defaultPrevented).toBe(false);
   });
+
+  it('ignores a right or middle mouse button, which is not a gesture', () => {
+    const event = Object.assign(new Event('pointerdown', { cancelable: true }), {
+      pointerId: 1,
+      pointerType: 'mouse',
+      clientX: 10,
+      clientY: 10,
+      button: 2,
+    });
+    surface.dispatchEvent(event);
+    vi.advanceTimersByTime(1000);
+    send('pointerup', 1, 10, 10, 'mouse');
+    expect(handlers.onTap).not.toHaveBeenCalled();
+    expect(handlers.onHover).not.toHaveBeenCalled();
+  });
+
+  it('does nothing with a touch that moves without having been pressed', () => {
+    send('pointermove', 9, 10, 10);
+    expect(handlers.onPan).not.toHaveBeenCalled();
+    expect(handlers.onHover).not.toHaveBeenCalled();
+  });
+
+  it('opens a passage on a double tap in the same place', () => {
+    send('pointerdown', 1, 80, 80);
+    send('pointerup', 1, 80, 80);
+    vi.advanceTimersByTime(50);
+    send('pointerdown', 1, 82, 81);
+    send('pointerup', 1, 82, 81);
+    expect(handlers.onDoubleTap).toHaveBeenCalledOnce();
+    expect(handlers.onTap).toHaveBeenCalledOnce();
+  });
+
+  it('treats two taps far apart as two taps, not one double', () => {
+    send('pointerdown', 1, 80, 80);
+    send('pointerup', 1, 80, 80);
+    vi.advanceTimersByTime(50);
+    send('pointerdown', 1, 300, 300);
+    send('pointerup', 1, 300, 300);
+    expect(handlers.onDoubleTap).not.toHaveBeenCalled();
+    expect(handlers.onTap).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps panning with the finger left behind when the other lifts', () => {
+    send('pointerdown', 1, 100, 100);
+    send('pointerdown', 2, 200, 100);
+    send('pointerup', 2, 200, 100);
+    handlers.onPan.mockClear();
+    send('pointermove', 1, 140, 100);
+    expect(handlers.onPan).toHaveBeenCalled();
+    expect(handlers.onTap).not.toHaveBeenCalled();
+  });
+
+  it('goes on pinching with the two fingers left of three', () => {
+    send('pointerdown', 1, 100, 100);
+    send('pointerdown', 2, 200, 100);
+    send('pointerdown', 3, 300, 100);
+    send('pointerup', 3, 300, 100);
+    handlers.onZoom.mockClear();
+    send('pointermove', 2, 300, 100);
+    expect(handlers.onZoom).toHaveBeenCalled();
+  });
+
+  it('cancels a press without selecting anything', () => {
+    send('pointerdown', 1, 50, 50);
+    send('pointercancel', 1, 50, 50);
+    expect(handlers.onTap).not.toHaveBeenCalled();
+  });
+
+  it('clears the hover when the mouse leaves the stage', () => {
+    send('pointerleave', 1, 0, 0, 'mouse');
+    expect(handlers.onLeave).toHaveBeenCalledOnce();
+  });
+
+  it('keeps the hover while a finger is still down and the pointer leaves', () => {
+    send('pointerdown', 1, 50, 50);
+    handlers.onLeave.mockClear();
+    send('pointerleave', 1, 0, 0, 'mouse');
+    expect(handlers.onLeave).not.toHaveBeenCalled();
+  });
+});
+
+describe('attachGestures, with a wheel', () => {
+  const createHandlers = () => ({
+    onPan: vi.fn<NonNullable<GestureHandlers['onPan']>>(),
+    onZoom: vi.fn<NonNullable<GestureHandlers['onZoom']>>(),
+  });
+  let surface: Surface;
+  let handlers: ReturnType<typeof createHandlers>;
+  let detach: () => void;
+
+  const wheel = (deltaX: number, deltaY: number, ctrlKey = false) => {
+    const event = Object.assign(new Event('wheel', { cancelable: true }), {
+      deltaX,
+      deltaY,
+      deltaMode: 0,
+      ctrlKey,
+      clientX: 100,
+      clientY: 100,
+    });
+    surface.dispatchEvent(event);
+    return event;
+  };
+
+  beforeEach(() => {
+    surface = new Surface();
+    handlers = createHandlers();
+    detach = attachGestures(surface, handlers);
+  });
+
+  afterEach(() => {
+    detach();
+  });
+
+  it('zooms on a vertical wheel, around the pointer', () => {
+    wheel(0, -120);
+    expect(handlers.onZoom).toHaveBeenCalledOnce();
+    expect(handlers.onZoom.mock.calls[0]?.[0]).toBeGreaterThan(1);
+    expect(handlers.onZoom.mock.calls[0]?.[1]).toEqual({ x: 100, y: 100 });
+  });
+
+  it('pans sideways on a horizontal wheel, as a trackpad swipe does', () => {
+    wheel(60, 0);
+    expect(handlers.onPan).toHaveBeenCalledWith(-60, 0);
+    expect(handlers.onZoom).not.toHaveBeenCalled();
+  });
+
+  it('zooms on a trackpad pinch, which arrives as a wheel with Ctrl held', () => {
+    wheel(40, -10, true);
+    expect(handlers.onZoom).toHaveBeenCalledOnce();
+  });
+
+  it('never lets the page scroll instead', () => {
+    expect(wheel(0, -120).defaultPrevented).toBe(true);
+  });
+
+  it('stops listening once detached', () => {
+    detach();
+    wheel(0, -120);
+    expect(handlers.onZoom).not.toHaveBeenCalled();
+  });
 });

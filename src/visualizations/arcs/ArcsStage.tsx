@@ -6,7 +6,8 @@ import { collectConnections, connectionLinkIds, type Connection } from '../share
 import type { LinkFilter } from '../shared/link-filter.ts';
 import { useElementSize } from '../shared/use-element-size.ts';
 import type { VizData } from '../shared/viz-data.ts';
-import { buildArcInstances } from './arc-instances.ts';
+import { buildArcInstances, buildVerseArcInstances } from './arc-instances.ts';
+import type { WordLayer } from '../shared/word-layer.ts';
 import { ArcsController, type ArcHover } from './arcs-controller.ts';
 import styles from './ArcsStage.module.css';
 
@@ -20,6 +21,8 @@ interface ArcsStageProps {
   readonly focus: Passage | null;
   /** A connection pointed at in the details panel: its arc and its whole passage stand out. */
   readonly preview: Connection | null;
+  /** A word opened in the details panel: its verses, drawn in brass from the verse it is in. */
+  readonly wordLayer: WordLayer | null;
   readonly onSelect: (passage: Passage | null) => void;
 }
 
@@ -31,6 +34,7 @@ export function ArcsStage({
   filter,
   focus,
   preview,
+  wordLayer,
   onSelect,
 }: ArcsStageProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -79,6 +83,18 @@ export function ArcsStage({
   }, [size]);
 
   useEffect(() => {
+    const { index } = data.crossReferences;
+    const perVerse = new Uint16Array(index.verseCount);
+    for (let verse = 0; verse < perVerse.length; verse += 1) {
+      perVerse[verse] = Math.min(index.outgoingCount(verse) + index.incomingCount(verse), 65535);
+    }
+    // The tallest bar is the 99.5th percentile, so a few heavily cited verses don't flatten the rest.
+    const sorted = Array.from(perVerse).sort((a, b) => a - b);
+    const cap = Math.max(1, sorted[Math.floor(sorted.length * 0.995)] ?? 1);
+    controllerRef.current?.setReferenceCounts({ perVerse, cap });
+  }, [data.crossReferences, data.versification]);
+
+  useEffect(() => {
     controllerRef.current?.setLinks(
       buildArcInstances(data.crossReferences.index, linkIds, data.verseGenres),
     );
@@ -114,6 +130,12 @@ export function ArcsStage({
         : null,
     );
   }, [preview, data]);
+
+  useEffect(() => {
+    controllerRef.current?.setWords(
+      wordLayer && buildVerseArcInstances(wordLayer.verse, wordLayer.verses, data.verseGenres),
+    );
+  }, [wordLayer, data.verseGenres]);
 
   return (
     <div

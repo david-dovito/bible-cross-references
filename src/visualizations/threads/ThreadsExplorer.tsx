@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import type { BookId } from '../../core/bible/books.ts';
 import { passageRange, type Passage } from '../../core/bible/passage.ts';
 import { BothDirectionsIcon, IncomingIcon, OutgoingIcon } from '../../shared/ui/icons.tsx';
@@ -12,6 +12,7 @@ import { SegmentedControl } from '../shared/components/SegmentedControl.tsx';
 import { VizPage } from '../shared/components/VizPage.tsx';
 import type { Connection } from '../shared/connections.ts';
 import { DEFAULT_LINK_FILTER, selectLinks } from '../shared/link-filter.ts';
+import { sameWordLayer, type WordLayer } from '../shared/word-layer.ts';
 import type { VizData } from '../shared/viz-data.ts';
 import type { VisualizationProps } from '../visualization.ts';
 import { ThreadsStage, type ThreadDirection } from './ThreadsStage.tsx';
@@ -55,6 +56,11 @@ export function ThreadsExplorer({
   const [direction, setDirection] = useState<ThreadDirection>('outgoing');
   const { book, chapter } = chapterOf(passage, data);
   const selectedVerse = passage?.kind === 'verse' ? passage.verse : null;
+  // One object per verse: the panel's effects depend on the passage, and a new one each render loops.
+  const versePassageOpen = useMemo<Passage | null>(
+    () => (selectedVerse === null ? null : { kind: 'verse', verse: selectedVerse }),
+    [selectedVerse],
+  );
   const { index } = data.crossReferences;
   const shownLinks = useMemo(
     () => selectLinks(index, data.verseGenres, filter).length,
@@ -70,6 +76,14 @@ export function ThreadsExplorer({
     readonly connection: Connection;
   } | null>(null);
   const previewed = preview?.passage === passage ? preview.connection : null;
+  // A word opened in the panel, drawn over the threads; it belongs to the verse it was opened on.
+  const [wordLayer, setWordLayer] = useState<WordLayer | null>(null);
+  // The panel reports its layer from an effect; keeping the old object when nothing changed
+  // stops a report from rendering the panel again, and so reporting again.
+  const reportWords = useCallback((layer: WordLayer | null) => {
+    setWordLayer((current) => (sameWordLayer(current, layer) ? current : layer));
+  }, []);
+  const shownWords = selectedVerse === wordLayer?.verse ? wordLayer : null;
 
   return (
     <VizPage
@@ -103,14 +117,16 @@ export function ThreadsExplorer({
         </>
       }
       panel={
-        selectedVerse !== null && (
+        selectedVerse !== null &&
+        versePassageOpen && (
           <PassagePanel
             data={data}
-            passage={{ kind: 'verse', verse: selectedVerse }}
+            passage={versePassageOpen}
             filter={filter}
-            actions={passageLinks({ kind: 'verse', verse: selectedVerse })}
+            actions={passageLinks(versePassageOpen)}
             onSelect={onNavigate}
             onClose={closePanel}
+            onWordLayer={reportWords}
             shareUrl={shareUrl}
             onPreview={(connection) => {
               setPreview(connection && passage && { passage, connection });
@@ -127,6 +143,7 @@ export function ThreadsExplorer({
         filter={filter}
         direction={direction}
         preview={previewed}
+        wordLayer={shownWords}
         onSelect={onNavigate}
       />
     </VizPage>

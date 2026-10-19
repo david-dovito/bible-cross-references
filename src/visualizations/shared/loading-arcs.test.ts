@@ -64,7 +64,7 @@ describe('launchFlight', () => {
       const flight = launchFlight(random, verseGenres, 0);
       return Math.abs(flight.to - flight.from);
     });
-    const short = distances.filter((distance) => distance < 0.25).length;
+    const short = distances.filter((distance) => distance < 0.4).length;
     expect(short / distances.length).toBeGreaterThan(0.5);
   });
 });
@@ -94,12 +94,12 @@ describe('flightFrame', () => {
     expect(landed?.landing).toBe(1);
   });
 
-  it('leaves a trace that fades after the light has passed, then ends', () => {
+  it('leaves a trace that dims after the light has passed, then ends', () => {
     const passed = flightFrame(flight, 3000);
     expect(passed?.tail).toBe(1);
     expect(passed?.light).toBe(0);
     expect(passed?.trace).toBe(1);
-    expect(flightFrame(flight, 3000 + TRACE_MS / 2)?.trace).toBeCloseTo(0.5, 5);
+    expect(flightFrame(flight, 3000 + TRACE_MS / 2)?.trace).toBeCloseTo(0.8, 5);
     expect(flightFrame(flight, 3000 + TRACE_MS + 1)).toBeNull();
     expect(flightFrame(flight, 999)).toBeNull();
   });

@@ -19,7 +19,7 @@ import {
   zoomView,
   type AxisView,
 } from './axis-view.ts';
-import { paintAxis } from './axis-painter.ts';
+import { paintAxis, type ReferenceCounts } from './axis-painter.ts';
 
 export interface ArcHover {
   readonly passage: Passage;
@@ -62,8 +62,20 @@ export function glowCeiling(arcCount: number): number {
   return Math.max(arcCount / 250, 20);
 }
 
-/** Length of the intro that grows the arcs, in ms: quick, so it never holds anyone up. */
-const INTRO_MS = 800;
+/**
+ * Length of the intro that grows the arcs, in ms: long enough to watch the Bible's links draw
+ * out from Genesis to Revelation (David, 2026-10-17: "Would love this to be more fully drawn
+ * out and animated through"). A tap or a drag never waits for it: the arcs respond throughout.
+ */
+const INTRO_MS = 3200;
+/**
+ * Most an intro frame may advance it. The first second after the data arrives is when the page
+ * is busiest, and at 800 ms of wall-clock time its stalls ate half the intro, so the arcs
+ * appeared all at once. Capped, a stall pauses the intro rather than skipping it; the cap is
+ * high enough that a slow GPU's ordinary frames (every intro frame redraws all 150,000 arcs)
+ * still keep to time.
+ */
+const INTRO_MAX_STEP_MS = 100;
 
 /**
  * A finger put down this close to the axis line, or on its labels, previews at once: the axis
@@ -79,6 +91,14 @@ const EDGE_PAN_ZONE_PX = 44;
 const EDGE_PAN_MAX_SPEED = 900;
 
 /**
+ * Whether to skip the intro: for readers who asked for less motion, and for a browser driven by a
+ * test, whose software renderer would draw the intro one slow frame at a time, for minutes.
+ */
+function skipsMotion(): boolean {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches || navigator.webdriver;
+}
+
+/**
  * Drives the arc diagram imperatively (no React re-renders on every wheel tick): it owns the
  * WebGL scene, the 2D overlay, the visible window, and all input handling.
  */
@@ -91,6 +111,7 @@ export class ArcsController {
   #layout: ArcLayout = computeArcLayout(0, 0);
   #view: AxisView;
   #focus: VerseIndexRange | null = null;
+  #referenceCounts: ReferenceCounts | null = null;
   #hover: VerseIndexRange | null = null;
   #linkPreview: ArcPreview | null = null;
   /** Where a finger previews, while it does; drives edge panning. */
@@ -109,6 +130,7 @@ export class ArcsController {
   constructor(options: ArcsControllerOptions) {
     this.#options = options;
     this.#scene = new ArcScene(options.glCanvas);
+    this.#scene.setVerseCount(options.versification.verseCount);
     const overlay = options.overlayCanvas.getContext('2d');
     if (!overlay) {
       throw new Error('Canvas 2D is not available.');
@@ -154,6 +176,7 @@ export class ArcsController {
     canvas.width = Math.round(width * ratio);
     canvas.height = Math.round(height * ratio);
     this.#overlay.setTransform(ratio, 0, 0, ratio, 0, 0);
+    this.#maybePlayIntro();
     this.#scheduler.request();
   }
 
@@ -161,9 +184,7 @@ export class ArcsController {
   setLinks(instances: ArcInstances): void {
     this.#scene.setLinks(instances, glowCeiling(instances.count));
     this.#hasLinks = instances.count > 0;
-    if (this.#intro === 'pending' && this.#hasLinks && this.#active) {
-      this.#playIntro();
-    }
+    this.#maybePlayIntro();
     this.#scheduler.request();
   }
 
@@ -172,6 +193,12 @@ export class ArcsController {
     this.#linksOfRange = resolver;
     this.#scene.setFocus(this.#focus && resolver(this.#focus));
     this.#scene.setHover(this.#hover && resolver(this.#hover));
+    this.#scheduler.request();
+  }
+
+  /** How often each verse is referenced, either way, for the histogram under the axis. */
+  setReferenceCounts(counts: ReferenceCounts | null): void {
+    this.#referenceCounts = counts;
     this.#scheduler.request();
   }
 
@@ -185,6 +212,12 @@ export class ArcsController {
         revealRange(this.#view, range.start, range.end + 1, this.#options.versification.verseCount),
       );
     }
+    this.#scheduler.request();
+  }
+
+  /** The word layer (see `ArcScene.setWords`), or `null` for none. */
+  setWords(instances: ArcInstances | null): void {
+    this.#scene.setWords(instances);
     this.#scheduler.request();
   }
 
@@ -214,30 +247,50 @@ export class ArcsController {
    * connections unfold at once, continuing the loading screen's arcs of light. Skipped for readers
    * who prefer reduced motion.
    */
+  /**
+   * The intro waits for everything it needs: the links, a stage with a size (before the first
+   * layout it is 0 by 0, and an intro run then is an intro nobody sees), and being on screen.
+   * Until it starts, the arcs are held at nothing, so they never flash in whole first.
+   */
+  #maybePlayIntro(): void {
+    if (this.#intro !== 'pending') {
+      return;
+    }
+    if (!skipsMotion()) {
+      this.#scene.setReveal(0);
+    }
+    if (this.#hasLinks && this.#active && this.#layout.width > 0 && this.#layout.height > 0) {
+      this.#playIntro();
+    }
+  }
+
   #playIntro(): void {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (skipsMotion()) {
+      this.#scene.setReveal(1);
       this.#intro = 'done';
       return;
     }
     this.#intro = 'running';
     this.#scene.setReveal(0);
-    this.#cancelIntro = animate(INTRO_MS, (progress) => {
-      this.#scene.setReveal(progress);
-      if (progress >= 1) {
-        this.#intro = 'done';
-        this.#cancelIntro = null;
-      }
-      this.#scheduler.request();
-    });
+    this.#cancelIntro = animate(
+      INTRO_MS,
+      (progress) => {
+        this.#scene.setReveal(progress);
+        if (progress >= 1) {
+          this.#intro = 'done';
+          this.#cancelIntro = null;
+        }
+        this.#scheduler.request();
+      },
+      { maxStepMs: INTRO_MAX_STEP_MS, easing: 'in-out' },
+    );
   }
 
   /** Shown or hidden; drawing resumes (and the intro starts) when it's shown. */
   setActive(active: boolean): void {
     this.#active = active;
     if (active) {
-      if (this.#intro === 'pending' && this.#hasLinks) {
-        this.#playIntro();
-      }
+      this.#maybePlayIntro();
       this.#scheduler.request();
     }
   }
@@ -255,6 +308,7 @@ export class ArcsController {
       focus: this.#focus,
       hover: this.#hover,
       passage: this.#linkPreview?.passage ?? null,
+      referenceCounts: this.#referenceCounts,
     });
   }
 

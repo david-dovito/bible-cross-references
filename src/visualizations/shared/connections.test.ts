@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { CANONICAL_VERSIFICATION } from '../../core/bible/versification.ts';
 import { CrossReferenceIndex } from '../../cross-references/cross-reference-index.ts';
 import { createCrossReferenceColumns, verseIndex } from '../../test-utils/fixtures.ts';
-import { collectConnections, groupByBook, landingNote } from './connections.ts';
+import { collectConnections, connectionLinkIds, groupByBook, landingNote } from './connections.ts';
 import { createLinkFilter } from './link-filter.ts';
 import { computeVerseGenres } from './verse-genres.ts';
 
@@ -90,5 +90,40 @@ describe('groupByBook', () => {
       ['Gen', 1],
       ['Rom', 2],
     ]);
+  });
+});
+
+describe('connectionLinkIds', () => {
+  it('names every link behind a passage, in both directions, once each', () => {
+    const index = new CrossReferenceIndex(
+      createCrossReferenceColumns([
+        { from: JOHN_3_16, to: ROM_5_8, votes: 10 },
+        { from: ROM_5_8, to: JOHN_3_16, votes: 10 },
+      ]),
+      CANONICAL_VERSIFICATION.verseCount,
+    );
+    const connections = collectConnections(
+      index,
+      { start: JOHN_3_16, end: JOHN_3_16 },
+      createLinkFilter(0),
+      verseGenres,
+    );
+    const ids = connectionLinkIds(connections);
+    expect(ids).toHaveLength(2);
+    expect(new Set(ids).size).toBe(2);
+  });
+
+  it('has nothing to name for a passage with no links', () => {
+    const index = new CrossReferenceIndex(
+      createCrossReferenceColumns([]),
+      CANONICAL_VERSIFICATION.verseCount,
+    );
+    const connections = collectConnections(
+      index,
+      { start: JOHN_3_16, end: JOHN_3_16 },
+      createLinkFilter(0),
+      verseGenres,
+    );
+    expect(connectionLinkIds(connections)).toEqual([]);
   });
 });

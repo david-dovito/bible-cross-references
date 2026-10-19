@@ -23,7 +23,8 @@ const EDGE_MARGIN = 16;
 /** Vertical layouts keep the top clear for the collapsed legend button. */
 const VERTICAL_TOP_MARGIN = 48;
 /** Room for the book bar and labels: below the axis (horizontal) or left of it (vertical). */
-const HORIZONTAL_LABEL_BAND = 58;
+/* The reference-count histogram hangs under the labels (see axis-painter.ts). */
+const HORIZONTAL_LABEL_BAND = 58 + 56;
 const VERTICAL_LABEL_BAND = 64;
 
 /** Portrait screens (phones) get a vertical axis so that the long dimension holds the Bible. */

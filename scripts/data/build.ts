@@ -6,6 +6,7 @@
  * Each dataset is produced by an importer that validates the raw data against the canonical
  * versification and fails loudly on anything unexpected.
  */
+import { rm } from 'node:fs/promises';
 import { DATASET_BUILDERS, type RawSourceReader } from './datasets.ts';
 import { downloadPinnedSource } from './lib/download.ts';
 import { formatBytes, readFileIfExists, sha256Hex, writeFileAtomic } from './lib/files.ts';
@@ -31,6 +32,12 @@ const readSource: RawSourceReader = async (sourceId) => {
 
 for (const builder of DATASET_BUILDERS) {
   const dataset = await builder.build(readSource);
+  if (dataset === null) {
+    // An optional source that isn't here: no dataset, and none left over from an earlier build.
+    await rm(publicFilePath(builder.outputPath), { force: true });
+    console.log(`– public/${builder.outputPath}: skipped (its source file isn't here)`);
+    continue;
+  }
   const json = JSON.stringify(dataset);
   await writeFileAtomic(publicFilePath(builder.outputPath), json);
   console.log(`✓ public/${builder.outputPath} (${formatBytes(Buffer.byteLength(json))})`);

@@ -15,10 +15,40 @@
       "description": "King James Version, eBible.org edition, verse-per-line text in a ZIP archive",
       "url": "https://ebible.org/Scriptures/eng-kjv2006_vpl.zip",
       "fileName": "eng-kjv2006_vpl.zip",
-      "sha256": "0058f0cca3a9609f14e435ebbb3c3165c84571de8fbd3d6d7181da8d2d0700ea",
-      "retrievedAt": "2026-10-17",
+      "sha256": "e76e03b6a644d7cdb33c22b90a55211376fae8cc7b6d8c74b8963a430eb85b77",
+      "retrievedAt": "2026-10-18",
       "license": "Public domain (United Kingdom: Crown copyright)",
       "homepage": "https://ebible.org/Scriptures/details.php?id=eng-kjv2006"
+    },
+    {
+      "id": "msb",
+      "description": "Majority Standard Bible, eBible.org edition, verse-per-line text in a ZIP archive",
+      "url": "https://ebible.org/Scriptures/engmsb_vpl.zip",
+      "fileName": "engmsb_vpl.zip",
+      "sha256": "911d8c7ca1d5490f99678d428e17845f67c66b27c4f4989b2f3851b77779ca40",
+      "retrievedAt": "2026-10-18",
+      "license": "Public domain",
+      "homepage": "https://majoritybible.com/"
+    },
+    {
+      "id": "asv",
+      "description": "American Standard Version (1901), eBible.org edition, verse-per-line text in a ZIP archive",
+      "url": "https://ebible.org/Scriptures/eng-asv_vpl.zip",
+      "fileName": "eng-asv_vpl.zip",
+      "sha256": "f89f9e28a9e74ae9be7ad5c8be19d5789f70a22cc14afb3cf548e7cd9324b1f8",
+      "retrievedAt": "2026-10-18",
+      "license": "Public domain",
+      "homepage": "https://ebible.org/Scriptures/details.php?id=eng-asv"
+    },
+    {
+      "id": "web",
+      "description": "World English Bible, eBible.org edition, verse-per-line text in a ZIP archive",
+      "url": "https://ebible.org/Scriptures/engwebp_vpl.zip",
+      "fileName": "engwebp_vpl.zip",
+      "sha256": "69276090e9c8e311199f2a6b7697c5a1435bd862ce31b320468ac72dabb4b7d5",
+      "retrievedAt": "2026-10-18",
+      "license": "Public domain",
+      "homepage": "https://worldenglish.bible/"
     },
     {
       "id": "openbible",
@@ -109,6 +139,446 @@
       "retrievedAt": "2026-10-16",
       "license": "CC BY 4.0",
       "homepage": "https://github.com/STEPBible/STEPBible-Data"
+    },
+    {
+      "id": "strongs-greek",
+      "description": "Strong's Greek dictionary (1890), Open Scriptures' JSON edition",
+      "url": "https://raw.githubusercontent.com/openscriptures/strongs/0acd2f251c2d35ff8db2dece4e0593979d3ac223/greek/strongs-greek-dictionary.js",
+      "fileName": "strongs-greek-dictionary.js",
+      "sha256": "7624ee738ae47e80f1a352223e28a26d011c9cd4898822cee52f47a010c04efd",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY-SA (Open Scriptures); the dictionary itself is public domain",
+      "homepage": "https://github.com/openscriptures/strongs"
+    },
+    {
+      "id": "strongs-hebrew",
+      "description": "Strong's Hebrew dictionary (1894), Open Scriptures' JSON edition",
+      "url": "https://raw.githubusercontent.com/openscriptures/strongs/0acd2f251c2d35ff8db2dece4e0593979d3ac223/hebrew/strongs-hebrew-dictionary.js",
+      "fileName": "strongs-hebrew-dictionary.js",
+      "sha256": "5ce6aeed551c709f49bcfa341cadf2f34bc7599b85d9de9e6ac2ecbf60fc3739",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY-SA (Open Scriptures); the dictionary itself is public domain",
+      "homepage": "https://github.com/openscriptures/strongs"
+    },
+    {
+      "id": "lxx-wordlist",
+      "description": "Open Scriptures Greek Word List (lemmas, Strong's numbers, definitions, roots) for the New Testament and the Septuagint",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/GreekWordList.js",
+      "fileName": "lxx-GreekWordList.js",
+      "sha256": "84703d5de9fae423c141ff374ffab73fcda288d0a400fcd500445302a5dbe483",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Gen",
+      "description": "Septuagint lemmas, Gen (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Gen.js",
+      "fileName": "lxx-Gen.js",
+      "sha256": "4da2dc0c4d4a35e6288509a829260c83bb65bed2f92229e3479b92fb76b3bc14",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Exod",
+      "description": "Septuagint lemmas, Exod (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Exod.js",
+      "fileName": "lxx-Exod.js",
+      "sha256": "aa323149a77849f9da62ddd59ccff1a276252936d6abf6319ecdbad87fe9c382",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Lev",
+      "description": "Septuagint lemmas, Lev (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Lev.js",
+      "fileName": "lxx-Lev.js",
+      "sha256": "180c6e400dce319f3acce3ad158fc398420cd2213a9c0b2ab259110408a083f0",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Num",
+      "description": "Septuagint lemmas, Num (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Num.js",
+      "fileName": "lxx-Num.js",
+      "sha256": "fdb6f711a5169e7ef01ac93cd174835f3211d8056d18cdb575796711e9068cf8",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Deut",
+      "description": "Septuagint lemmas, Deut (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Deut.js",
+      "fileName": "lxx-Deut.js",
+      "sha256": "d43e2f7d1c60b7c8b1e91a7976b3cfff08fa0e20bb5f9d77f3fcc19bb834b665",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-JoshB",
+      "description": "Septuagint lemmas, JoshB (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/JoshB.js",
+      "fileName": "lxx-JoshB.js",
+      "sha256": "09188feeda1c6a660f87dfdca2f28bf81c3847231f739278a29a6ef7367f86ea",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-JudgB",
+      "description": "Septuagint lemmas, JudgB (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/JudgB.js",
+      "fileName": "lxx-JudgB.js",
+      "sha256": "e6c7173d5c05ef7a59f25716d098a3e1ed6d5cad3e5362f6eb4611beef48a0ce",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Ruth",
+      "description": "Septuagint lemmas, Ruth (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Ruth.js",
+      "fileName": "lxx-Ruth.js",
+      "sha256": "e32d7ba98b4f579518c25bf8b6dcc35522428bc18a44ec07577e0836c0120b12",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-1Sam",
+      "description": "Septuagint lemmas, 1Sam (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/1Sam.js",
+      "fileName": "lxx-1Sam.js",
+      "sha256": "0486e24d78e9395a15b1aae58e95b0b94b9b39c4306df870cd3906639c8ae113",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-2Sam",
+      "description": "Septuagint lemmas, 2Sam (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/2Sam.js",
+      "fileName": "lxx-2Sam.js",
+      "sha256": "dfae7a60006fb14c2dafb01c5978f8750d45cf9b68d63b54d101d4027dbae068",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-1Kgs",
+      "description": "Septuagint lemmas, 1Kgs (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/1Kgs.js",
+      "fileName": "lxx-1Kgs.js",
+      "sha256": "d5e843183f172a30c58fca76abb6d7f9745dfb04e85f10df7c459a5c777ed70a",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-2Kgs",
+      "description": "Septuagint lemmas, 2Kgs (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/2Kgs.js",
+      "fileName": "lxx-2Kgs.js",
+      "sha256": "b57e1d9c8be34de6389c127376fd95ccffbf84e030cda6eae458786ed3869458",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-1Chr",
+      "description": "Septuagint lemmas, 1Chr (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/1Chr.js",
+      "fileName": "lxx-1Chr.js",
+      "sha256": "8cfb3dee08a9a2e009c500c36e1851b80babe1d875796ffcbcebb9c21786f5a2",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-2Chr",
+      "description": "Septuagint lemmas, 2Chr (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/2Chr.js",
+      "fileName": "lxx-2Chr.js",
+      "sha256": "9b274764519a83ce69b2de0977a806d96c2a4b29c3cded5fcc7eda8468b408c0",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-2Esd",
+      "description": "Septuagint lemmas, 2Esd (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/2Esd.js",
+      "fileName": "lxx-2Esd.js",
+      "sha256": "3714d04af4a8e5421038cf565d158c2c3261351d7c7a5599cf2b80415822961e",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Esth",
+      "description": "Septuagint lemmas, Esth (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Esth.js",
+      "fileName": "lxx-Esth.js",
+      "sha256": "1b997203a3bb65571550e15fe2f770d7546167579417189652f255b2a4c5a6d7",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Job",
+      "description": "Septuagint lemmas, Job (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Job.js",
+      "fileName": "lxx-Job.js",
+      "sha256": "9068e9510f066316a3ff43c65db0f5b7a12992c15ce562ff15e3ba740425abfb",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Ps",
+      "description": "Septuagint lemmas, Ps (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Ps.js",
+      "fileName": "lxx-Ps.js",
+      "sha256": "bf7264c582076d790a44f628352f50e692945ffbb31ec183495b98f4cbdfb291",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Prov",
+      "description": "Septuagint lemmas, Prov (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Prov.js",
+      "fileName": "lxx-Prov.js",
+      "sha256": "31d0709e037681e6de3dd29444914fe3faf77e5696b7a0405d13a45476a68927",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Eccl",
+      "description": "Septuagint lemmas, Eccl (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Eccl.js",
+      "fileName": "lxx-Eccl.js",
+      "sha256": "03d95fbd3fbf85e53dbaa72fc0f0c7da8540b32e41f4dce82d04bb8245b53346",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Song",
+      "description": "Septuagint lemmas, Song (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Song.js",
+      "fileName": "lxx-Song.js",
+      "sha256": "2b42225c744d46ac4cd8793118d304f96e0fdb836a77cfc310712133d593848d",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Isa",
+      "description": "Septuagint lemmas, Isa (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Isa.js",
+      "fileName": "lxx-Isa.js",
+      "sha256": "cc79c1ce7e0008374d6b9e9b0d18d4784f8d5403202242e239a983c8a3beed29",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Jer",
+      "description": "Septuagint lemmas, Jer (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Jer.js",
+      "fileName": "lxx-Jer.js",
+      "sha256": "b917af7efa231521fcc9be27a2704dbd51142efa6374a870ae02ada52978e24c",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Lam",
+      "description": "Septuagint lemmas, Lam (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Lam.js",
+      "fileName": "lxx-Lam.js",
+      "sha256": "e0b92b75fdb82e7c316c00c64160c5c3404f82343ecb117b63164706ddecbed0",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Ezek",
+      "description": "Septuagint lemmas, Ezek (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Ezek.js",
+      "fileName": "lxx-Ezek.js",
+      "sha256": "081f820407b85e0c9277ead849d8a3702977f840c4d203b031f68ab168b63db4",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-DanTh",
+      "description": "Septuagint lemmas, DanTh (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/DanTh.js",
+      "fileName": "lxx-DanTh.js",
+      "sha256": "472ca039c2817b7a26076bf55fca9198417046d487132f7c1a47c3c6157ef223",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Hos",
+      "description": "Septuagint lemmas, Hos (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Hos.js",
+      "fileName": "lxx-Hos.js",
+      "sha256": "64a98de950508a89a9abba545b627383fd5838eb7c0bf9ac85283b8dd811124d",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Joel",
+      "description": "Septuagint lemmas, Joel (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Joel.js",
+      "fileName": "lxx-Joel.js",
+      "sha256": "0476d31a1054261ae5d0033ef93c7029ab49fa9875ff7046f0ee15c851d5642c",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Amos",
+      "description": "Septuagint lemmas, Amos (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Amos.js",
+      "fileName": "lxx-Amos.js",
+      "sha256": "5fa604d999110ade83ed006497226c0c6020e0b5b1337266d56ad7674b005af0",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Obad",
+      "description": "Septuagint lemmas, Obad (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Obad.js",
+      "fileName": "lxx-Obad.js",
+      "sha256": "e4f43eec273373261f135f488ac0e3029d8479c2271bc09453c2ba24fc87bc59",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Jonah",
+      "description": "Septuagint lemmas, Jonah (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Jonah.js",
+      "fileName": "lxx-Jonah.js",
+      "sha256": "28ef2ebc5492ccd1d8201076cb48bace3935053f42515dcf8d545a76ba66206a",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Mic",
+      "description": "Septuagint lemmas, Mic (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Mic.js",
+      "fileName": "lxx-Mic.js",
+      "sha256": "508cfdbb4294f9448786fba2b2269e3af7b3e93c33350be0dbeb077c2921712a",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Nah",
+      "description": "Septuagint lemmas, Nah (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Nah.js",
+      "fileName": "lxx-Nah.js",
+      "sha256": "47e6ec1804f7b92d1e34cdedbd8389fa8a4207eb2f48e9a35a79ee75392025e4",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Hab",
+      "description": "Septuagint lemmas, Hab (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Hab.js",
+      "fileName": "lxx-Hab.js",
+      "sha256": "86c45001673b92efb36409215aa9de7bac9ec2f1d509e4b411760ec5ab18e980",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Zeph",
+      "description": "Septuagint lemmas, Zeph (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Zeph.js",
+      "fileName": "lxx-Zeph.js",
+      "sha256": "3322e3d38db6eeb4a2a9f43e82b8bc746ffe2cccf5f5dc7dc61b3f5bddd6079d",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Hag",
+      "description": "Septuagint lemmas, Hag (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Hag.js",
+      "fileName": "lxx-Hag.js",
+      "sha256": "95dc06099af06577f926593ecdf1855cddafc37f09378fa1aa0f2b6b999d81e2",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Zech",
+      "description": "Septuagint lemmas, Zech (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Zech.js",
+      "fileName": "lxx-Zech.js",
+      "sha256": "9c931347645311266a153fb935c349ebc12ddcc9007771cede66bdcc6d4ff533",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "lxx-Mal",
+      "description": "Septuagint lemmas, Mal (Open Scriptures LxxLemmas)",
+      "url": "https://raw.githubusercontent.com/openscriptures/GreekResources/dd5a2fd530ab3c6b748c174cec38966c356d8111/LxxLemmas/Mal.js",
+      "fileName": "lxx-Mal.js",
+      "sha256": "3bcdf0735f9850d89dd272fab13d5b927cf4148ebb8031bb01404afb4159df22",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Septuagint Project)",
+      "homepage": "https://github.com/openscriptures/GreekResources"
+    },
+    {
+      "id": "kjv-strongs",
+      "description": "King James Version with Strong's numbers on its words, eBible.org USFM edition (for how the KJV translates each word)",
+      "url": "https://ebible.org/Scriptures/eng-kjv2006_usfm.zip",
+      "fileName": "eng-kjv2006_usfm.zip",
+      "sha256": "16b08c9248b3600662f66f1e055f61fc3a6c7275e347236ee45feb35dfb20cb3",
+      "retrievedAt": "2026-10-17",
+      "license": "Public domain (United Kingdom: Crown copyright)",
+      "homepage": "https://ebible.org/Scriptures/details.php?id=eng-kjv2006"
+    },
+    {
+      "id": "bdb",
+      "description": "Brown-Driver-Briggs Hebrew lexicon, Open Scriptures Hebrew Lexicon edition",
+      "url": "https://raw.githubusercontent.com/openscriptures/HebrewLexicon/21c9add13bc727d3a951361778e97e3ff7afd1ce/BrownDriverBriggs.xml",
+      "fileName": "bdb-BrownDriverBriggs.xml",
+      "sha256": "2b52658a4323d91674cda4090ab8b3ebddfff640f4f18143c28300e80b2c38f8",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Hebrew Bible Project); the BDB text is public domain",
+      "homepage": "https://github.com/openscriptures/HebrewLexicon"
+    },
+    {
+      "id": "bdb-index",
+      "description": "Open Scriptures lexical index: BDB entries by Strong's number",
+      "url": "https://raw.githubusercontent.com/openscriptures/HebrewLexicon/21c9add13bc727d3a951361778e97e3ff7afd1ce/LexicalIndex.xml",
+      "fileName": "bdb-LexicalIndex.xml",
+      "sha256": "8f7a605c58899d2f44430149c143c00903976e1e91232476677972a69e5bc85f",
+      "retrievedAt": "2026-10-17",
+      "license": "CC BY 4.0 (Open Scriptures Hebrew Bible Project)",
+      "homepage": "https://github.com/openscriptures/HebrewLexicon"
     }
   ]
 }

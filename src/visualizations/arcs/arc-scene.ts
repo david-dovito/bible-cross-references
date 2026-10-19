@@ -9,6 +9,7 @@ import {
   RawShaderMaterial,
   Scene,
   Vector2,
+  Vector3,
   type Blending,
   type WebGLRenderer,
 } from 'three';
@@ -80,12 +81,14 @@ export class ArcScene {
     u_maxHeight: { value: 0 },
     u_vertical: { value: 0 },
     u_reveal: { value: 1 },
+    u_total: { value: 1 },
     u_palette: { value: genrePaletteUniform() },
   };
   readonly #lines: ArcObject;
   readonly #hover: ArcObject;
   readonly #focus: ArcObject;
   readonly #preview: ArcObject;
+  readonly #words: ArcObject;
 
   constructor(canvas: HTMLCanvasElement) {
     this.#renderer = createRenderer(canvas);
@@ -102,9 +105,15 @@ export class ArcScene {
       1.8,
     );
     this.#preview = this.#createObject(this.#overlayScene, 'ribbon', NormalBlending, 1, 2);
+    this.#words = this.#createObject(this.#overlayScene, 'ribbon', NormalBlending, 0.9, 1.5);
+    const tint = this.#words.material.uniforms;
+    // Brass Light, the dark --brass (#C29A55): WebGL can't read the CSS token.
+    tint['u_tint'] = { value: new Vector3(0.761, 0.604, 0.333) };
+    tint['u_tintAmount'] = { value: 1 };
     this.#hover.renderOrder = 1;
     this.#focus.renderOrder = 2;
-    this.#preview.renderOrder = 3;
+    this.#words.renderOrder = 3;
+    this.#preview.renderOrder = 4;
   }
 
   setSize(width: number, height: number): void {
@@ -139,7 +148,12 @@ export class ArcScene {
     this.#glow.invalidate();
   }
 
-  /** How much of every arc is drawn, from its source (0–1): the intro animates it. */
+  /** How many verses the axis holds, which places each arc's source along the intro's sweep. */
+  setVerseCount(count: number): void {
+    this.#common.u_total.value = count;
+  }
+
+  /** The intro's progress (0–1): arcs grow from their sources, swept Genesis to Revelation. */
   setReveal(reveal: number): void {
     this.#common.u_reveal.value = reveal;
     this.#glow.invalidate();
@@ -158,6 +172,14 @@ export class ArcScene {
     this.#replace(this.#focus, instances ?? EMPTY);
   }
 
+  /**
+   * The word layer: from the verse a word was opened on to every other verse that uses it (or its
+   * family, or its Septuagint counterparts), in brass over the cross-references.
+   */
+  setWords(instances: ArcInstances | null): void {
+    this.#replace(this.#words, instances ?? EMPTY);
+  }
+
   /** One link on its own, on top; the focused passage's links fade meanwhile. */
   setPreview(instances: ArcInstances | null): void {
     this.#replace(this.#preview, instances ?? EMPTY);
@@ -174,7 +196,7 @@ export class ArcScene {
   }
 
   dispose(): void {
-    for (const object of [this.#lines, this.#hover, this.#focus, this.#preview]) {
+    for (const object of [this.#lines, this.#hover, this.#focus, this.#preview, this.#words]) {
       object.geometry.dispose();
       object.material.dispose();
     }
@@ -195,7 +217,13 @@ export class ArcScene {
       glslVersion: GLSL3,
       vertexShader: kind === 'line' ? LINE_VERTEX_SHADER : RIBBON_VERTEX_SHADER,
       fragmentShader: kind === 'line' ? LINE_FRAGMENT_SHADER : RIBBON_FRAGMENT_SHADER,
-      uniforms: { ...this.#common, u_alpha: { value: alpha }, u_width: { value: width } },
+      uniforms: {
+        ...this.#common,
+        u_alpha: { value: alpha },
+        u_width: { value: width },
+        u_tint: { value: new Vector3(1, 1, 1) },
+        u_tintAmount: { value: 0 },
+      },
       transparent: true,
       depthTest: false,
       depthWrite: false,

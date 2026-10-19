@@ -1,7 +1,7 @@
 /**
  * The offline cache. It makes repeat visits load from the device and lets the app work offline.
  *
- * The site lives under a path of a shared origin (trekhleb.dev/bible-cross-references/), so:
+ * The site lives under a path of a shared origin (david-dovito.github.io/bible-cross-references/), so:
  * - the worker's scope is that path (browsers allow no wider scope for a worker served there), and
  *   it only ever handles requests under it;
  * - every cache it creates starts with `PREFIX`, and it only ever reads or deletes its own caches,

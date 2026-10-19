@@ -4,13 +4,30 @@ import { RetryIcon } from '../../../shared/ui/icons.tsx';
 import { resetTranslations, vizCoreLoader, type VizCore } from '../viz-data.ts';
 import styles from './controls.module.css';
 import { LoadingArcs } from './LoadingArcs.tsx';
+import { createCachedLoader } from '../../../shared/lib/cached-loader.ts';
+import { landLoadingArcs } from '../loading-handoff.ts';
 
 interface VizDataBoundaryProps {
   readonly children: (core: VizCore) => ReactNode;
 }
 
+/**
+ * The data, once the loading arcs in the air have landed (loading-handoff.ts): the first time
+ * only, since a reader coming back to the explorer finds the data already here.
+ */
+const shownLoader = createCachedLoader(async (): Promise<VizCore> => {
+  const core = await vizCoreLoader.load();
+  await landLoadingArcs();
+  return core;
+});
+
+/** Forgets the data this boundary showed, so the next mount loads it again (for tests). */
+export function resetShownData(): void {
+  shownLoader.reset();
+}
+
 function Loaded({ children }: VizDataBoundaryProps) {
-  return children(use(vizCoreLoader.load()));
+  return children(use(shownLoader.load()));
 }
 
 /**
@@ -29,6 +46,7 @@ export function VizDataBoundary({ children }: VizDataBoundaryProps) {
             className={styles.button}
             onClick={() => {
               vizCoreLoader.reset();
+              shownLoader.reset();
               resetTranslations();
               reset();
             }}
