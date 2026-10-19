@@ -23,7 +23,7 @@ interface LoadingArcsProps {
 /** At most this many arcs at once, counting the traces that stay. */
 const MAX_FLIGHTS = 400;
 /** A new arc takes off after a random pause in this range, in ms. */
-const LAUNCH_PAUSE_MS = { min: 18, max: 60 };
+const LAUNCH_PAUSE_MS = { min: 5, max: 20 };
 /** The fade into the explorer, in ms; matches the CSS. */
 const FADE_MS = 700;
 /** Thickness of the axis, in CSS pixels. */
