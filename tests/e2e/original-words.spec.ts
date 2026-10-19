@@ -44,9 +44,8 @@ test.describe('the Hebrew and Greek behind a verse', () => {
   });
 
   test('the word stays below its section while its verses scroll past', async ({ page }) => {
-    // A word with a long list of verses (κόσμος, about 180), so there is room to scroll past.
-    await openPassage(page, 'John.3.16');
-    const word = page.locator(PANEL).getByRole('button', { name: /kosmos/ });
+    await openPassage(page, 'Acts.5.14');
+    const word = page.locator(PANEL).getByRole('button', { name: /plēthos/ });
     await word.click();
     await word.scrollIntoViewIfNeeded();
     const scroll = page.locator(`${PANEL} [class*="scroll"]`);
